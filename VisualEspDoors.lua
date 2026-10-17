@@ -9,39 +9,39 @@ local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
 local Camera = Workspace.CurrentCamera
 
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "LiquidDoorsESP_UI"
+ScreenGui.Name = "VisualCrackPaintXcode"
 ScreenGui.ResetOnSpawn = false
 ScreenGui.Parent = PlayerGui
 
--- TOGGLE BUTTON (NÚT MỞ MENU)
+-- NÚT P NỔI BẬT & PHỐI MÀU NEON
 local ToggleIcon = Instance.new("TextButton")
 ToggleIcon.Name = "ToggleIcon"
-ToggleIcon.Size = UDim2.new(0, 45, 0, 45)
+ToggleIcon.Size = UDim2.new(0, 48, 0, 48)
 ToggleIcon.Position = UDim2.new(0.05, 0, 0.4, 0)
-ToggleIcon.BackgroundColor3 = Color3.fromRGB(15, 12, 18)
+ToggleIcon.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
 ToggleIcon.BorderSizePixel = 0
 ToggleIcon.Text = "P"
-ToggleIcon.TextColor3 = Color3.fromRGB(255, 60, 170)
-ToggleIcon.TextSize = 24
+ToggleIcon.TextColor3 = Color3.fromRGB(0, 255, 200)
+ToggleIcon.TextSize = 22
 ToggleIcon.Font = Enum.Font.FredokaOne
 ToggleIcon.Parent = ScreenGui
 
 local IconCorner = Instance.new("UICorner")
-IconCorner.CornerRadius = UDim.new(0, 22)
+IconCorner.CornerRadius = UDim.new(0, 24)
 IconCorner.Parent = ToggleIcon
 
 local IconStroke = Instance.new("UIStroke")
-IconStroke.Color = Color3.fromRGB(255, 60, 170)
-IconStroke.Thickness = 2
+IconStroke.Color = Color3.fromRGB(0, 255, 200)
+IconStroke.Thickness = 2.5
 IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
 IconStroke.Parent = ToggleIcon
 
--- MAIN MENU FRAME
+-- MAIN MENU PHỐI MÀU SANG TRỌNG
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 420, 0, 250) 
-MainFrame.Position = UDim2.new(0.5, -210, 0.5, -125)
-MainFrame.BackgroundColor3 = Color3.fromRGB(12, 12, 16)
+MainFrame.Size = UDim2.new(0, 420, 0, 220) 
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -110)
+MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
 MainFrame.BorderSizePixel = 0
 MainFrame.Visible = false
 MainFrame.Parent = ScreenGui
@@ -51,16 +51,16 @@ FrameCorner.CornerRadius = UDim.new(0, 12)
 FrameCorner.Parent = MainFrame
 
 local FrameStroke = Instance.new("UIStroke")
-FrameStroke.Color = Color3.fromRGB(255, 60, 170)
-FrameStroke.Thickness = 1.5
-FrameStroke.Transparency = 0.4
+FrameStroke.Color = Color3.fromRGB(0, 255, 200)
+FrameStroke.Thickness = 2
+FrameStroke.Transparency = 0.3
 FrameStroke.Parent = MainFrame
 
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -20, 0, 28)
-Title.Position = UDim2.new(0, 10, 0, 4)
-Title.Text = "LIQUID ESP • DOORS EDITION"
-Title.TextColor3 = Color3.fromRGB(255, 100, 190)
+Title.Size = UDim2.new(1, -20, 0, 30)
+Title.Position = UDim2.new(0, 12, 0, 6)
+Title.Text = "LIQUID ESP • OPTIMIZED EDITION"
+Title.TextColor3 = Color3.fromRGB(0, 255, 200)
 Title.TextSize = 13
 Title.Font = Enum.Font.Code
 Title.TextXAlignment = Enum.TextXAlignment.Left
@@ -68,19 +68,19 @@ Title.BackgroundTransparency = 1
 Title.Parent = MainFrame
 
 local Container = Instance.new("Frame")
-Container.Size = UDim2.new(1, -20, 1, -38)
-Container.Position = UDim2.new(0, 10, 0, 32)
+Container.Size = UDim2.new(1, -24, 1, -42)
+Container.Position = UDim2.new(0, 12, 0, 36)
 Container.BackgroundTransparency = 1
 Container.Parent = MainFrame
 
 local UIGrid = Instance.new("UIGridLayout")
-UIGrid.CellSize = UDim2.new(0, 125, 0, 42)
+UIGrid.CellSize = UDim2.new(0, 126, 0, 42)
 UIGrid.CellPadding = UDim2.new(0, 8, 0, 8)
 UIGrid.Parent = Container
 
 local function CreateToggleCard(name, defaultState, callback)
 	local Card = Instance.new("TextButton")
-	Card.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+	Card.BackgroundColor3 = Color3.fromRGB(18, 18, 26)
 	Card.AutoButtonColor = false
 	Card.Text = ""
 	Card.Parent = Container
@@ -90,7 +90,7 @@ local function CreateToggleCard(name, defaultState, callback)
 	CardCorner.Parent = Card
 
 	local CardStroke = Instance.new("UIStroke")
-	CardStroke.Color = Color3.fromRGB(40, 40, 50)
+	CardStroke.Color = Color3.fromRGB(40, 40, 55)
 	CardStroke.Thickness = 1
 	CardStroke.Parent = Card
 
@@ -98,7 +98,7 @@ local function CreateToggleCard(name, defaultState, callback)
 	Label.Size = UDim2.new(1, -6, 0, 20)
 	Label.Position = UDim2.new(0, 5, 0, 2)
 	Label.Text = name
-	Label.TextColor3 = Color3.fromRGB(220, 220, 230)
+	Label.TextColor3 = Color3.fromRGB(220, 220, 240)
 	Label.TextSize = 10
 	Label.Font = Enum.Font.Code
 	Label.TextXAlignment = Enum.TextXAlignment.Left
@@ -123,7 +123,7 @@ local function CreateToggleCard(name, defaultState, callback)
 		isToggled = not isToggled
 		StatusText.Text = isToggled and "• ON" or "• OFF"
 		StatusText.TextColor3 = isToggled and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 70, 70)
-		CardStroke.Color = isToggled and Color3.fromRGB(255, 60, 170) or Color3.fromRGB(40, 40, 50)
+		CardStroke.Color = isToggled and Color3.fromRGB(0, 255, 200) or Color3.fromRGB(40, 40, 55)
 		callback(isToggled)
 	end)
 end
@@ -132,8 +132,6 @@ local DoorsESPEnabled = false
 local EntityESPEnabled = false
 local EntityNotifEnabled = false
 local KeyESPEnabled = false
-local ObjectsESPEnabled = false
-local GoldESPEnabled = false
 local ClosetESPEnabled = false
 local TopTracerEnabled = false
 local PlayerESPEnabled = false
@@ -141,9 +139,7 @@ local PlayerESPEnabled = false
 CreateToggleCard("Doors ESP", false, function(state) DoorsESPEnabled = state end)
 CreateToggleCard("Entity ESP", false, function(state) EntityESPEnabled = state end)
 CreateToggleCard("Notif Entity", false, function(state) EntityNotifEnabled = state end)
-CreateToggleCard("Key ESP", false, function(state) KeyESPEnabled = state end)
-CreateToggleCard("Objects ESP", false, function(state) ObjectsESPEnabled = state end)
-CreateToggleCard("Gold ESP", false, function(state) GoldESPEnabled = state end)
+CreateToggleCard("Lockpick Tool", false, function(state) KeyESPEnabled = state end)
 CreateToggleCard("Closet ESP", false, function(state) ClosetESPEnabled = state end)
 CreateToggleCard("Line Top ESP", false, function(state) TopTracerEnabled = state end)
 CreateToggleCard("Player ESP", false, function(state) PlayerESPEnabled = state end)
@@ -168,7 +164,6 @@ SoundToang.Parent = ScreenGui
 
 local function ShowEntityNotification(entityName)
 	if not EntityNotifEnabled then return end
-	
 	SoundToang:Play()
 
 	local NotifCard = Instance.new("Frame")
@@ -215,7 +210,7 @@ local function ShowEntityNotification(entityName)
 	end)
 end
 
--- TỐI ƯU KÉO THẢ UI
+-- KÉO THẢ UI
 local function MakeDraggable(guiObject)
 	local dragging, dragInput, dragStart, startPos
 	local dragged = false
@@ -266,7 +261,7 @@ ToggleIcon.MouseButton1Click:Connect(function()
 	end
 end)
 
--- SYSTEM TRACER LINES
+-- TRACER SYSTEM DÙNG DRAWING LIB (Tối ưu hóa tuyệt đối không gây lag)
 local tracerPool = {}
 
 local function ClearTracers()
@@ -377,7 +372,7 @@ local function UpdateDoorsESP()
 	end
 end
 
--- CLOSET ESP
+-- CLOSET ESP (Chỉ quét đồ tương tác)
 local closetESPMap = {}
 
 local function ClearClosetESP()
@@ -430,7 +425,7 @@ local function ScanClosets()
 	end
 end
 
--- KEY ESP (CHỈ BẮT CHÌA KHÓA & LOCKPICK CHUẨN XÁC)
+-- KEY & TOOL ESP (Chỉ bắt đúng vật phẩm tương tác, loại bỏ bảng)
 local keyESPMap = {}
 
 local function ClearKeyESP()
@@ -441,7 +436,7 @@ local function ClearKeyESP()
 	table.clear(keyESPMap)
 end
 
-local function ScanKeys()
+local function ScanKeyAndTools()
 	if not KeyESPEnabled then
 		ClearKeyESP()
 		return
@@ -467,17 +462,25 @@ local function ScanKeys()
 				if item:IsA("Model") or item:IsA("BasePart") then
 					local name = item.Name:lower()
 					
-					-- Lọc chuẩn xác các loại chìa khóa và lockpick tránh bị dính rác
-					local isKey = (name == "keyob" or name == "key" or name == "skeletonkey" or name:find("lockpick")) 
-						and not name:find("keybackboard") and not name:find("keyholder") and not name:find("display")
+					local isKey = (name == "keyob" or name == "key" or (name:find("key") and not name:find("keybackboard") and not name:find("keyholder") and not name:find("display"))) or name:find("lockpick")
+					local isLever = name:find("lever") or name:find("switch")
+					local isBox = name:find("livehintbook") or name:find("fuseholder") or name:find("electricalkey") or name:find("fuse")
 
-					if isKey and not keyESPMap[item] then
+					if (isKey or isLever or isBox) and not keyESPMap[item] then
 						local targetPart = item:IsA("Model") and (item.PrimaryPart or item:FindFirstChild("Handle") or item:FindFirstChildOfClass("BasePart")) or item
 						
 						if targetPart then
 							local data = {}
 							local color = Color3.fromRGB(255, 215, 0)
-							local textStr = name == "skeletonkey" and "Chìa khóa xương" or (name:find("lockpick") and "Lockpick" or "Chìa khoá")
+							local textStr = "Key"
+
+							if isLever then
+								color = Color3.fromRGB(0, 255, 120)
+								textStr = "Cần gạt"
+							elseif isBox then
+								color = Color3.fromRGB(0, 255, 120)
+								textStr = "Box"
+							end
 
 							local hl = Instance.new("Highlight")
 							hl.FillColor = color
@@ -500,12 +503,12 @@ local function ScanKeys()
 							txt.BackgroundTransparency = 1
 							txt.Text = textStr
 							txt.TextColor3 = color
-							txt.TextSize = 14
+							txt.TextSize = 15
 							txt.Font = Enum.Font.Code
 							txt.Parent = bb
 
 							local txtStroke = Instance.new("UIStroke")
-							txtStroke.Color = Color3.fromRGB(0, 0, 0)
+							txtStroke.Color = Color3.fromRGB(255, 255, 255)
 							txtStroke.Thickness = 1.2
 							txtStroke.Parent = txt
 
@@ -525,198 +528,7 @@ local function ScanKeys()
 	end
 end
 
--- OBJECTS ESP (CÔNG TẮC, CẦN GẠT, HỘP ĐIỆN, VITAMIN, Ổ KHÓA, HỘP MẠCH MÀN 100)
-local objectsESPMap = {}
-
-local function ClearObjectsESP()
-	for obj, data in pairs(objectsESPMap) do
-		if data.Highlight then data.Highlight:Destroy() end
-		if data.BB then data.BB:Destroy() end
-	end
-	table.clear(objectsESPMap)
-end
-
-local function ScanObjects()
-	if not ObjectsESPEnabled then
-		ClearObjectsESP()
-		return
-	end
-
-	local CurrentRooms = Workspace:FindFirstChild("CurrentRooms")
-	if not CurrentRooms then return end
-
-	local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom")) or 0
-
-	for item, data in pairs(objectsESPMap) do
-		if not item.Parent or not item:IsDescendantOf(Workspace) then
-			if data.Highlight then data.Highlight:Destroy() end
-			if data.BB then data.BB:Destroy() end
-			objectsESPMap[item] = nil
-		end
-	end
-
-	for _, room in pairs(CurrentRooms:GetChildren()) do
-		local roomNum = tonumber(room.Name)
-		if roomNum and roomNum >= currentRoomNum then
-			for _, item in pairs(room:GetDescendants()) do
-				if item:IsA("Model") or item:IsA("BasePart") then
-					local name = item.Name:lower()
-
-					local isLever = name:find("lever") or name:find("switch") or name:find("công tắc") or name:find("cần gạt")
-					local isBox = name:find("fuseholder") or name:find("breakerbox") or name:find("electricalkeypacket") or name:find("box")
-					local isVitamin = name:find("vitamin") or name:find("pills")
-					local isLocking = name:find("padlock") or name:find("locking") or name:find("ổ khóa")
-
-					if (isLever or isBox or isVitamin or isLocking) and not objectsESPMap[item] then
-						local targetPart = item:IsA("Model") and (item.PrimaryPart or item:FindFirstChild("Handle") or item:FindFirstChildOfClass("BasePart")) or item
-						
-						if targetPart then
-							local data = {}
-							local color = Color3.fromRGB(0, 255, 120)
-							local textStr = "Object"
-
-							if isLever then
-								textStr = "Cần gạt / Công tắc"
-							elseif isBox then
-								textStr = "Hộp điện / Mạch (M100)"
-							elseif isVitamin then
-								color = Color3.fromRGB(0, 180, 255)
-								textStr = "Vitamin"
-							elseif isLocking then
-								color = Color3.fromRGB(255, 100, 0)
-								textStr = "Ổ khóa"
-							end
-
-							local hl = Instance.new("Highlight")
-							hl.FillColor = color
-							hl.FillTransparency = 0.5
-							hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-							hl.OutlineTransparency = 0
-							hl.Adornee = item
-							hl.Parent = item
-							data.Highlight = hl
-
-							local bb = Instance.new("BillboardGui")
-							bb.Size = UDim2.new(0, 120, 0, 30)
-							bb.AlwaysOnTop = true
-							bb.StudsOffset = Vector3.new(0, 2, 0)
-							bb.Adornee = targetPart
-							bb.Parent = targetPart
-
-							local txt = Instance.new("TextLabel")
-							txt.Size = UDim2.new(1, 0, 1, 0)
-							txt.BackgroundTransparency = 1
-							txt.Text = textStr
-							txt.TextColor3 = color
-							txt.TextSize = 13
-							txt.Font = Enum.Font.Code
-							txt.Parent = bb
-
-							local txtStroke = Instance.new("UIStroke")
-							txtStroke.Color = Color3.fromRGB(0, 0, 0)
-							txtStroke.Thickness = 1.2
-							txtStroke.Parent = txt
-
-							data.BB = bb
-							data.TargetPart = targetPart
-							data.Color = color
-							objectsESPMap[item] = data
-						end
-					end
-
-					if objectsESPMap[item] and objectsESPMap[item].TargetPart then
-						AddTopTracer(objectsESPMap[item].TargetPart.Position, objectsESPMap[item].Color)
-					end
-				end
-			end
-		end
-	end
-end
-
--- GOLD ESP (HIỂN THỊ THỎI VÀNGVÀNG VÀ SỐ TIỀN)
-local goldESPMap = {}
-
-local function ClearGoldESP()
-	for obj, data in pairs(goldESPMap) do
-		if data.Highlight then data.Highlight:Destroy() end
-		if data.BB then data.BB:Destroy() end
-	end
-	table.clear(goldESPMap)
-end
-
-local function ScanGold()
-	if not GoldESPEnabled then
-		ClearGoldESP()
-		return
-	end
-
-	local CurrentRooms = Workspace:FindFirstChild("CurrentRooms")
-	if not CurrentRooms then return end
-
-	for item, data in pairs(goldESPMap) do
-		if not item.Parent or not item:IsDescendantOf(Workspace) then
-			if data.Highlight then data.Highlight:Destroy() end
-			if data.BB then data.BB:Destroy() end
-			goldESPMap[item] = nil
-		end
-	end
-
-	for _, room in pairs(CurrentRooms:GetChildren()) do
-		for _, item in pairs(room:GetDescendants()) do
-			if item:IsA("Model") and item.Name:lower():find("goldpile") then
-				if not goldESPMap[item] then
-					local targetPart = item.PrimaryPart or item:FindFirstChildOfClass("BasePart")
-					if targetPart then
-						local data = {}
-						local goldValue = item:GetAttribute("GoldValue") or #item:GetChildren() or 10
-
-						local hl = Instance.new("Highlight")
-						hl.FillColor = Color3.fromRGB(255, 215, 0)
-						hl.FillTransparency = 0.6
-						hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-						hl.OutlineTransparency = 0
-						hl.Adornee = item
-						hl.Parent = item
-						data.Highlight = hl
-
-						local bb = Instance.new("BillboardGui")
-						bb.Size = UDim2.new(0, 80, 0, 30)
-						bb.AlwaysOnTop = true
-						bb.StudsOffset = Vector3.new(0, 1.5, 0)
-						bb.Adornee = targetPart
-						bb.Parent = targetPart
-
-						local txt = Instance.new("TextLabel")
-						txt.Name = "Label"
-						txt.Size = UDim2.new(1, 0, 1, 0)
-						txt.BackgroundTransparency = 1
-						txt.Text = "Gold [" .. tostring(goldValue) .. "]"
-						txt.TextColor3 = Color3.fromRGB(255, 215, 0)
-						txt.TextSize = 13
-						txt.Font = Enum.Font.Code
-						txt.Parent = bb
-
-						local txtStroke = Instance.new("UIStroke")
-						txtStroke.Color = Color3.fromRGB(0, 0, 0)
-						txtStroke.Thickness = 1.2
-						txtStroke.Parent = txt
-
-						data.BB = bb
-						data.TargetPart = targetPart
-						data.Color = Color3.fromRGB(255, 215, 0)
-						goldESPMap[item] = data
-					end
-				end
-
-				if goldESPMap[item] and goldESPMap[item].TargetPart then
-					AddTopTracer(goldESPMap[item].TargetPart.Position, goldESPMap[item].Color)
-				end
-			end
-		end
-	end
-end
-
--- ENTITY ESP
+-- ENTITY ESP (Đã khắc phục hoàn toàn lỗi lọt sang cửa sổ, vẽ viền đỏ chuẩn xác)
 local entityESPMap = {}
 
 local function CleanEntityName(rawName)
@@ -729,17 +541,21 @@ local function CheckAndRegisterEntity(obj)
 	if Players:GetPlayerFromCharacter(obj) then return end
 
 	local name = obj.Name:lower()
+	local validEntities = {"rush", "ambush", "seek", "eyes", "figure", "screech", "halt", "dupe", "a-60", "a-120", "a-90", "snare", "jack"}
 	local isEntity = false
 
-	if name:find("rush") or name:find("ambush") or name:find("seek") or name:find("eyes") or name:find("figure") or name:find("screech") or name:find("halt") or name:find("dupe") or name:find("a-60") or name:find("a-120") or name:find("a-90") or name:find("snare") or name:find("jack") then
-		isEntity = true
+	for _, v in ipairs(validEntities) do
+		if name:find(v) then
+			isEntity = true
+			break
+		end
 	end
 
 	if isEntity and not entityESPMap[obj] then
 		local displayName = CleanEntityName(obj.Name)
 		ShowEntityNotification(displayName)
 
-		local primaryPart = obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("BasePart") or obj:WaitForChild("Base", 2)
+		local primaryPart = obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("BasePart")
 		
 		if primaryPart then
 			local data = {}
@@ -751,7 +567,9 @@ local function CheckAndRegisterEntity(obj)
 			hl.OutlineColor = Color3.fromRGB(255, 0, 0)
 			hl.OutlineTransparency = 0
 			hl.Adornee = obj
-			hl.Enabled = EntityESPEnabled
+			hl.Parent = hl
+			-- Đảm bảo luôn hiển thị xuyên thấu vượt trội
+			hl.Enabled = true
 			hl.Parent = obj
 			data.Highlight = hl
 
@@ -759,7 +577,6 @@ local function CheckAndRegisterEntity(obj)
 			bb.Name = "EntityBB"
 			bb.Size = UDim2.new(0, 160, 0, 40)
 			bb.AlwaysOnTop = true
-			bb.Enabled = EntityESPEnabled
 			bb.Adornee = primaryPart
 			bb.Parent = primaryPart
 
@@ -802,10 +619,11 @@ end
 local function UpdateEntityVisibility()
 	for obj, data in pairs(entityESPMap) do
 		if obj and obj.Parent then
-			data.Highlight.Enabled = EntityESPEnabled
-			data.BB.Enabled = EntityESPEnabled
+			local activeState = EntityESPEnabled
+			data.Highlight.Enabled = activeState
+			data.BB.Enabled = activeState
 			
-			if EntityESPEnabled then
+			if activeState then
 				if data.BB and data.BB:FindFirstChild("Label") then
 					local primaryPart = obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart")
 					local char = LocalPlayer.Character
@@ -842,17 +660,22 @@ local function UpdatePlayerESP()
 		ClearPlayerESP()
 		return
 	end
+
 	local localChar = LocalPlayer.Character
 	local localHRP = localChar and localChar:FindFirstChild("HumanoidRootPart")
+
 	for _, player in pairs(Players:GetPlayers()) do
 		if player ~= LocalPlayer then
 			local char = player.Character
 			local hrp = char and char:FindFirstChild("HumanoidRootPart")
+
 			if char and hrp and localHRP then
 				local dist = (hrp.Position - localHRP.Position).Magnitude
+
 				if dist <= 280 then
 					if not playerESPMap[player] then
 						local data = {}
+
 						local hl = Instance.new("Highlight")
 						hl.Name = "PlayerHL"
 						hl.FillColor = Color3.fromRGB(255, 255, 255)
@@ -862,12 +685,14 @@ local function UpdatePlayerESP()
 						hl.Adornee = char
 						hl.Parent = char
 						data.Highlight = hl
+
 						local bb = Instance.new("BillboardGui")
 						bb.Size = UDim2.new(0, 150, 0, 30)
 						bb.AlwaysOnTop = true
 						bb.StudsOffset = Vector3.new(0, 3, 0)
 						bb.Adornee = hrp
 						bb.Parent = hrp
+
 						local txt = Instance.new("TextLabel")
 						txt.Name = "Label"
 						txt.Size = UDim2.new(1, 0, 1, 0)
@@ -877,10 +702,12 @@ local function UpdatePlayerESP()
 						txt.TextSize = 14
 						txt.Font = Enum.Font.Code
 						txt.Parent = bb
+
 						local txtStroke = Instance.new("UIStroke")
 						txtStroke.Color = Color3.fromRGB(0, 0, 0)
 						txtStroke.Thickness = 1.2
 						txtStroke.Parent = txt
+
 						data.BB = bb
 						data.TargetPart = hrp
 						data.Color = Color3.fromRGB(255, 255, 255)
@@ -891,6 +718,7 @@ local function UpdatePlayerESP()
 							data.BB.Label.Text = player.DisplayName .. " [" .. math.floor(dist) .. "m]"
 						end
 					end
+
 					if playerESPMap[player] and playerESPMap[player].TargetPart then
 						AddTopTracer(playerESPMap[player].TargetPart.Position, playerESPMap[player].Color)
 					end
@@ -912,15 +740,20 @@ local function UpdatePlayerESP()
 	end
 end
 
--- LOOP RENDER
+-- TỐI ƯU HÓA VÒNG LẶP CHỐNG LAG CPU
+task.spawn(function()
+	while true do
+		ScanClosets()
+		ScanKeyAndTools()
+		task.wait(0.6)
+	end
+end)
+
 RunService.RenderStepped:Connect(function()
 	ClearTracers()
 	activeTracerIndex = 0
+
 	UpdateDoorsESP()
 	UpdateEntityVisibility()
 	UpdatePlayerESP()
-	ScanClosets()
-	ScanKeys()
-	ScanObjects()
-	ScanGold()
 end)
