@@ -1,759 +1,757 @@
+local Repository = "https://raw.githubusercontent.com/deividcomsono/Obsidian/main/"
+local success, Obsidian = pcall(function()
+    return loadstring(game:HttpGet(Repository .. "Library.lua"))()
+end)
+
+if not success or type(Obsidian) ~= "table" then
+    task.wait(0.1)
+    local retrySuccess, retryLib = pcall(function()
+        return loadstring(game:HttpGet(Repository .. "Library.lua"))()
+    end)
+    if retrySuccess and type(retryLib) == "table" then
+        Obsidian = retryLib
+    else
+        error("Khong the tai thu vien UI Obsidian!")
+    end
+end
+
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
-local TweenService = game:GetService("TweenService")
-
+local SoundService = game:GetService("SoundService")
 local LocalPlayer = Players.LocalPlayer
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local Camera = Workspace.CurrentCamera
 
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "VisualCrackPaintXcode"
-ScreenGui.ResetOnSpawn = false
-ScreenGui.Parent = PlayerGui
+local currentLanguage = "Tiếng Việt"
 
--- NÚT P NỔI BẬT & PHỐI MÀU NEON
-local ToggleIcon = Instance.new("TextButton")
-ToggleIcon.Name = "ToggleIcon"
-ToggleIcon.Size = UDim2.new(0, 48, 0, 48)
-ToggleIcon.Position = UDim2.new(0.05, 0, 0.4, 0)
-ToggleIcon.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
-ToggleIcon.BorderSizePixel = 0
-ToggleIcon.Text = "P"
-ToggleIcon.TextColor3 = Color3.fromRGB(0, 255, 200)
-ToggleIcon.TextSize = 22
-ToggleIcon.Font = Enum.Font.FredokaOne
-ToggleIcon.Parent = ScreenGui
-
-local IconCorner = Instance.new("UICorner")
-IconCorner.CornerRadius = UDim.new(0, 24)
-IconCorner.Parent = ToggleIcon
-
-local IconStroke = Instance.new("UIStroke")
-IconStroke.Color = Color3.fromRGB(0, 255, 200)
-IconStroke.Thickness = 2.5
-IconStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-IconStroke.Parent = ToggleIcon
-
--- MAIN MENU PHỐI MÀU SANG TRỌNG
-local MainFrame = Instance.new("Frame")
-MainFrame.Name = "MainFrame"
-MainFrame.Size = UDim2.new(0, 420, 0, 220) 
-MainFrame.Position = UDim2.new(0.5, -210, 0.5, -110)
-MainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-MainFrame.BorderSizePixel = 0
-MainFrame.Visible = false
-MainFrame.Parent = ScreenGui
-
-local FrameCorner = Instance.new("UICorner")
-FrameCorner.CornerRadius = UDim.new(0, 12)
-FrameCorner.Parent = MainFrame
-
-local FrameStroke = Instance.new("UIStroke")
-FrameStroke.Color = Color3.fromRGB(0, 255, 200)
-FrameStroke.Thickness = 2
-FrameStroke.Transparency = 0.3
-FrameStroke.Parent = MainFrame
-
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -20, 0, 30)
-Title.Position = UDim2.new(0, 12, 0, 6)
-Title.Text = "LIQUID ESP • OPTIMIZED EDITION"
-Title.TextColor3 = Color3.fromRGB(0, 255, 200)
-Title.TextSize = 13
-Title.Font = Enum.Font.Code
-Title.TextXAlignment = Enum.TextXAlignment.Left
-Title.BackgroundTransparency = 1
-Title.Parent = MainFrame
-
-local Container = Instance.new("Frame")
-Container.Size = UDim2.new(1, -24, 1, -42)
-Container.Position = UDim2.new(0, 12, 0, 36)
-Container.BackgroundTransparency = 1
-Container.Parent = MainFrame
-
-local UIGrid = Instance.new("UIGridLayout")
-UIGrid.CellSize = UDim2.new(0, 126, 0, 42)
-UIGrid.CellPadding = UDim2.new(0, 8, 0, 8)
-UIGrid.Parent = Container
-
-local function CreateToggleCard(name, defaultState, callback)
-	local Card = Instance.new("TextButton")
-	Card.BackgroundColor3 = Color3.fromRGB(18, 18, 26)
-	Card.AutoButtonColor = false
-	Card.Text = ""
-	Card.Parent = Container
-
-	local CardCorner = Instance.new("UICorner")
-	CardCorner.CornerRadius = UDim.new(0, 6)
-	CardCorner.Parent = Card
-
-	local CardStroke = Instance.new("UIStroke")
-	CardStroke.Color = Color3.fromRGB(40, 40, 55)
-	CardStroke.Thickness = 1
-	CardStroke.Parent = Card
-
-	local Label = Instance.new("TextLabel")
-	Label.Size = UDim2.new(1, -6, 0, 20)
-	Label.Position = UDim2.new(0, 5, 0, 2)
-	Label.Text = name
-	Label.TextColor3 = Color3.fromRGB(220, 220, 240)
-	Label.TextSize = 10
-	Label.Font = Enum.Font.Code
-	Label.TextXAlignment = Enum.TextXAlignment.Left
-	Label.TextWrapped = true
-	Label.BackgroundTransparency = 1
-	Label.Parent = Card
-
-	local StatusText = Instance.new("TextLabel")
-	StatusText.Size = UDim2.new(1, -6, 0, 16)
-	StatusText.Position = UDim2.new(0, 5, 0, 22)
-	StatusText.Text = defaultState and "• ON" or "• OFF"
-	StatusText.TextColor3 = defaultState and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 70, 70)
-	StatusText.TextSize = 10
-	StatusText.Font = Enum.Font.Code
-	StatusText.TextXAlignment = Enum.TextXAlignment.Left
-	StatusText.BackgroundTransparency = 1
-	StatusText.Parent = Card
-
-	local isToggled = defaultState
-
-	Card.MouseButton1Click:Connect(function()
-		isToggled = not isToggled
-		StatusText.Text = isToggled and "• ON" or "• OFF"
-		StatusText.TextColor3 = isToggled and Color3.fromRGB(0, 255, 150) or Color3.fromRGB(255, 70, 70)
-		CardStroke.Color = isToggled and Color3.fromRGB(0, 255, 200) or Color3.fromRGB(40, 40, 55)
-		callback(isToggled)
-	end)
-end
-
-local DoorsESPEnabled = false
-local EntityESPEnabled = false
-local EntityNotifEnabled = false
-local KeyESPEnabled = false
-local ClosetESPEnabled = false
-local TopTracerEnabled = false
-local PlayerESPEnabled = false
-
-CreateToggleCard("Doors ESP", false, function(state) DoorsESPEnabled = state end)
-CreateToggleCard("Entity ESP", false, function(state) EntityESPEnabled = state end)
-CreateToggleCard("Notif Entity", false, function(state) EntityNotifEnabled = state end)
-CreateToggleCard("Lockpick Tool", false, function(state) KeyESPEnabled = state end)
-CreateToggleCard("Closet ESP", false, function(state) ClosetESPEnabled = state end)
-CreateToggleCard("Line Top ESP", false, function(state) TopTracerEnabled = state end)
-CreateToggleCard("Player ESP", false, function(state) PlayerESPEnabled = state end)
-
-local NotifContainer = Instance.new("Frame")
-NotifContainer.Name = "NotifContainer"
-NotifContainer.Size = UDim2.new(0, 200, 0, 300)
-NotifContainer.Position = UDim2.new(1, -210, 0, 15)
-NotifContainer.BackgroundTransparency = 1
-NotifContainer.Parent = ScreenGui
-
-local NotifLayout = Instance.new("UIListLayout")
-NotifLayout.SortOrder = Enum.SortOrder.LayoutOrder
-NotifLayout.VerticalAlignment = Enum.VerticalAlignment.Top
-NotifLayout.Padding = UDim.new(0, 6)
-NotifLayout.Parent = NotifContainer
-
-local SoundToang = Instance.new("Sound")
-SoundToang.SoundId = "rbxassetid://9114223178"
-SoundToang.Volume = 2.5
-SoundToang.Parent = ScreenGui
-
-local function ShowEntityNotification(entityName)
-	if not EntityNotifEnabled then return end
-	SoundToang:Play()
-
-	local NotifCard = Instance.new("Frame")
-	NotifCard.Size = UDim2.new(0, 0, 0, 38)
-	NotifCard.BackgroundColor3 = Color3.fromRGB(20, 15, 22)
-	NotifCard.BorderSizePixel = 0
-	NotifCard.ClipsDescendants = true
-	NotifCard.Parent = NotifContainer
-
-	local CardCorner = Instance.new("UICorner")
-	CardCorner.CornerRadius = UDim.new(0, 6)
-	CardCorner.Parent = NotifCard
-
-	local CardStroke = Instance.new("UIStroke")
-	CardStroke.Color = Color3.fromRGB(255, 50, 80)
-	CardStroke.Thickness = 1.2
-	CardStroke.Parent = NotifCard
-
-	local MsgLabel = Instance.new("TextLabel")
-	MsgLabel.Size = UDim2.new(1, -10, 1, 0)
-	MsgLabel.Position = UDim2.new(0, 8, 0, 0)
-	MsgLabel.Text = "⚠️ ENTITY: " .. string.upper(entityName)
-	MsgLabel.TextColor3 = Color3.fromRGB(255, 80, 100)
-	MsgLabel.TextSize = 11
-	MsgLabel.Font = Enum.Font.Code
-	MsgLabel.TextXAlignment = Enum.TextXAlignment.Left
-	MsgLabel.BackgroundTransparency = 1
-	MsgLabel.Parent = NotifCard
-
-	TweenService:Create(NotifCard, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		Size = UDim2.new(1, 0, 0, 38)
-	}):Play()
-
-	task.delay(2.7, function()
-		if NotifCard and NotifCard.Parent then
-			local hideTween = TweenService:Create(NotifCard, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.In), {
-				Size = UDim2.new(0, 0, 0, 38)
-			})
-			hideTween:Play()
-			hideTween.Completed:Connect(function()
-				NotifCard:Destroy()
-			end)
-		end
-	end)
-end
-
--- KÉO THẢ UI
-local function MakeDraggable(guiObject)
-	local dragging, dragInput, dragStart, startPos
-	local dragged = false
-
-	guiObject.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-			dragging = true
-			dragged = false
-			dragStart = input.Position
-			startPos = guiObject.Position
-
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
-
-	guiObject.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then
-			local delta = input.Position - dragStart
-			if delta.Magnitude > 6 then
-				dragged = true
-			end
-			guiObject.Position = UDim2.new(
-				startPos.X.Scale, startPos.X.Offset + delta.X,
-				startPos.Y.Scale, startPos.Y.Offset + delta.Y
-			)
-		end
-	end)
-
-	return function() return dragged end
-end
-
-local isIconMoved = MakeDraggable(ToggleIcon)
-MakeDraggable(MainFrame)
-
-ToggleIcon.MouseButton1Click:Connect(function()
-	if not isIconMoved() then
-		MainFrame.Visible = not MainFrame.Visible
-	end
+-- Khởi tạo âm thanh an toàn với bộ nhớ
+task.spawn(function()
+    pcall(function()
+        local initSound = Instance.new("Sound")
+        initSound.SoundId = "rbxassetid://9119802009"
+        initSound.Volume = 2.0
+        initSound.Parent = SoundService
+        initSound:Play()
+        task.delay(3, function()
+            if initSound then initSound:Destroy() end
+        end)
+    end)
+    task.wait(0.5)
+    Obsidian:Notify({
+        Title = "TwinKhook V10 - Strict Mode",
+        Description = "Đã tối ưu hóa hiệu năng & chống rò rỉ RAM!",
+        Time = 3
+    })
 end)
 
--- TRACER SYSTEM DÙNG DRAWING LIB (Tối ưu hóa tuyệt đối không gây lag)
-local tracerPool = {}
+local Window = Obsidian:CreateWindow({
+    Title = "TwinKhook V10 [Optimized]",
+    SubTitle = "By PaintCrack",
+    TabWidth = 100,
+    Size = UDim2.new(0, 550, 0, 280),
+    Center = true,
+    AutoShow = true,
+    MenuFadeTime = 0.15
+})
 
-local function ClearTracers()
-	for _, line in pairs(tracerPool) do
-		line.Visible = false
-	end
+local Tabs = {
+    Main = Window:AddTab("Main", "user"),
+    ESP = Window:AddTab("ESP", "eye"),
+    Objects = Window:AddTab("Objects", "box"),
+    Sound = Window:AddTab("Sound", "music"),
+    Settings = Window:AddTab("Settings", "cog")
+}
+
+local MainLeft = Tabs.Main:AddLeftGroupbox("Exploits")
+local MainRight = Tabs.Main:AddRightGroupbox("Optimization")
+local EspLeft = Tabs.ESP:AddLeftGroupbox("Doors & Entities")
+local EspRight = Tabs.ESP:AddRightGroupbox("Players & Support")
+local ObjectsLeft = Tabs.Objects:AddLeftGroupbox("Room Objects ESP")
+local ObjectsRight = Tabs.Objects:AddRightGroupbox("Filters")
+local SoundLeft = Tabs.Sound:AddLeftGroupbox("Entity Notification")
+local SoundRight = Tabs.Sound:AddRightGroupbox("Alert Settings")
+local SettingsLeft = Tabs.Settings:AddLeftGroupbox("Ngôn ngữ / Language")
+local SettingsRight = Tabs.Settings:AddRightGroupbox("Menu Settings")
+
+-- SETTINGS
+local selectedLang = "Tiếng Việt"
+local langDropdown = SettingsLeft:AddDropdown("LanguageDropdown", {
+    Values = {"Tiếng Việt", "English"}, Default = 1, Multi = false,
+    Text = "Chọn ngôn ngữ", Tooltip = "Đổi ngôn ngữ giao diện & ESP"
+})
+langDropdown:OnChanged(function(v) selectedLang = v end)
+
+SettingsLeft:AddButton("Change Translation", function()
+    currentLanguage = selectedLang
+    Obsidian:Notify({
+        Title = currentLanguage == "English" and "Language Updated" or "Đã cập nhật",
+        Description = currentLanguage == "English" and "Switched to English!" or "Đã chuyển sang Tiếng Việt!",
+        Time = 3
+    })
+end)
+
+SettingsRight:AddButton("RejoinServer", "Rejoin Game", function()
+    game:GetService("TeleportService"):Teleport(game.PlaceId, LocalPlayer)
+end)
+
+SettingsRight:AddButton("UnloadMenu", "Unload Menu", function()
+    Obsidian:Unload()
+end)
+
+-- REACH DOORS (Tối ưu hóa vòng lặp, kiểm tra kỹ trạng thái nhân vật)
+local reachMode = "Teleport"
+MainLeft:AddDropdown("ReachModeDropdown", {
+    Values = {"Teleport", "RemoteEvent"}, Default = 1, Multi = false,
+    Text = "Phương thức Reach", Tooltip = "Chọn cách thức mở cửa"
+}):OnChanged(function(v) reachMode = v end)
+
+local reachMultiplier = 1.5
+MainLeft:AddSlider("ReachSlider", {
+    Text = "Reach Distance", Default = 1.5, Min = 1, Max = 11, Rounding = 1, Compact = true
+}):OnChanged(function(v) reachMultiplier = v end)
+
+local reachToggle = MainLeft:AddToggle("ReachToggle", {
+    Text = "Reach Doors", Default = false, Tooltip = "Tự động mở cửa từ xa an toàn"
+})
+
+local function checkDoorLocked(door)
+    if not door then return false end
+    if door:GetAttribute("Locked") or door:GetAttribute("IsLocked") then return true end
+    if door.Parent and door.Parent:GetAttribute("Locked") then return true end
+    for _, v in pairs(door:GetDescendants()) do
+        local n = v.Name:lower()
+        if (v:IsA("BasePart") or v:IsA("Model")) and (n:find("lock") or n:find("padlock") or n:find("code")) then
+            if (v:IsA("BasePart") and v.Transparency ~= 1) or v:IsA("Model") then return true end
+        end
+    end
+    return false
 end
 
-local function GetTracerLine(index)
-	if not tracerPool[index] then
-		local line = Drawing.new("Line")
-		line.Thickness = 1.5
-		line.Transparency = 1
-		line.Visible = false
-		tracerPool[index] = line
-	end
-	return tracerPool[index]
+local function checkDoorOpen(door)
+    if not door then return false end
+    if door:GetAttribute("Opened") or door:GetAttribute("IsOpen") then return true end
+    for _, v in pairs(door:GetDescendants()) do
+        local n = v.Name:lower()
+        if v:IsA("BoolValue") and (n:find("open") or n:find("unlock")) and v.Value then return true end
+    end
+    return false
 end
 
-local activeTracerIndex = 0
-
-local function AddTopTracer(targetPos, color)
-	if not TopTracerEnabled then return end
-	local screenPos, onScreen = Camera:WorldToViewportPoint(targetPos)
-	if onScreen then
-		activeTracerIndex = activeTracerIndex + 1
-		local line = GetTracerLine(activeTracerIndex)
-		line.From = Vector2.new(Camera.ViewportSize.X / 2, 0)
-		line.To = Vector2.new(screenPos.X, screenPos.Y)
-		line.Color = color
-		line.Visible = true
-	end
-end
+reachToggle:OnChanged(function(Value)
+    task.spawn(function()
+        local lastTP = 0
+        while reachToggle.Value do
+            local char = LocalPlayer.Character
+            local hum = char and char:FindFirstChildOfClass("Humanoid")
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            
+            if char and hum and hum.Health > 0 and hrp then
+                local currentRoom = LocalPlayer:GetAttribute("CurrentRoom")
+                local rooms = Workspace:FindFirstChild("CurrentRooms")
+                local roomObj = rooms and rooms:FindFirstChild(tostring(currentRoom))
+                
+                if roomObj and roomObj:FindFirstChild("Door") then
+                    local door = roomObj.Door
+                    local doorPart = door:FindFirstChild("Door") or door:FindFirstChildWhichIsA("BasePart")
+                    if doorPart and (hrp.Position - doorPart.Position).Magnitude <= (reachMultiplier * 4.0) then
+                        if not checkDoorOpen(door) and not checkDoorLocked(door) and (tick() - lastTP > 0.4) then
+                            lastTP = tick()
+                            pcall(function()
+                                if reachMode == "RemoteEvent" then
+                                    if door:FindFirstChild("ClientOpen") then door.ClientOpen:FireServer() end
+                                    local prompt = door:FindFirstChildWhichIsA("ProximityPrompt", true)
+                                    if prompt then fireproximityprompt(prompt) end
+                                else
+                                    local oldCF = hrp.CFrame
+                                    hrp.CFrame = doorPart.CFrame + Vector3.new(0, 0, 2)
+                                    RunService.Heartbeat:Wait()
+                                    if door:FindFirstChild("ClientOpen") then door.ClientOpen:FireServer() end
+                                    hrp.CFrame = oldCF
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+            task.wait(0.2)
+        end
+    end)
+end)
 
 -- DOORS ESP
-local doorESPMap = {}
+local espColor = Color3.fromRGB(0, 255, 200)
+local doorESPTracks = {}
 
-local function UpdateDoorsESP()
-	local CurrentRooms = Workspace:FindFirstChild("CurrentRooms")
-	if not CurrentRooms then return end
-
-	local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom")) or 0
-
-	for roomName, data in pairs(doorESPMap) do
-		local roomNum = tonumber(roomName)
-		if not DoorsESPEnabled or (roomNum and roomNum < currentRoomNum) then
-			if data.Highlight then data.Highlight:Destroy() end
-			if data.BB then data.BB:Destroy() end
-			doorESPMap[roomName] = nil
-		end
-	end
-
-	if not DoorsESPEnabled then return end
-
-	for _, room in pairs(CurrentRooms:GetChildren()) do
-		local roomNumber = tonumber(room.Name)
-		if roomNumber and roomNumber >= currentRoomNum then
-			local door = room:FindFirstChild("Door")
-			if door then
-				local doorBase = door:FindFirstChild("Door") or door:FindFirstChild("PrimaryPart") or door
-				
-				if not doorESPMap[room.Name] and doorBase then
-					local data = {}
-					local displayDoorNum = roomNumber + 1
-
-					local highlight = Instance.new("Highlight")
-					highlight.Name = "DoorHighlight"
-					highlight.FillTransparency = 0.85
-					highlight.FillColor = Color3.fromRGB(0, 230, 255)
-					highlight.OutlineColor = Color3.fromRGB(0, 235, 255)
-					highlight.OutlineTransparency = 0
-					highlight.Adornee = doorBase
-					highlight.Parent = doorBase
-					data.Highlight = highlight
-
-					local bb = Instance.new("BillboardGui")
-					bb.Size = UDim2.new(0, 80, 0, 30)
-					bb.AlwaysOnTop = true
-					bb.StudsOffset = Vector3.new(0, 3.5, 0)
-					bb.Adornee = doorBase
-					bb.Parent = doorBase
-
-					local txt = Instance.new("TextLabel")
-					txt.Size = UDim2.new(1, 0, 1, 0)
-					txt.BackgroundTransparency = 1
-					txt.Text = tostring(displayDoorNum)
-					txt.TextColor3 = Color3.fromRGB(0, 235, 255)
-					txt.TextSize = 22
-					txt.Font = Enum.Font.Code
-					txt.Parent = bb
-
-					local txtStroke = Instance.new("UIStroke")
-					txtStroke.Color = Color3.fromRGB(255, 255, 255)
-					txtStroke.Thickness = 1.5
-					txtStroke.Parent = txt
-
-					data.BB = bb
-					data.TargetPart = doorBase
-					data.Color = Color3.fromRGB(0, 235, 255)
-					doorESPMap[room.Name] = data
-				end
-
-				if doorESPMap[room.Name] and doorESPMap[room.Name].TargetPart then
-					AddTopTracer(doorESPMap[room.Name].TargetPart.Position, doorESPMap[room.Name].Color)
-				end
-			end
-		end
-	end
-end
-
--- CLOSET ESP (Chỉ quét đồ tương tác)
-local closetESPMap = {}
-
-local function ClearClosetESP()
-	for item, hl in pairs(closetESPMap) do
-		if hl then hl:Destroy() end
-	end
-	table.clear(closetESPMap)
-end
-
-local function ScanClosets()
-	if not ClosetESPEnabled then
-		ClearClosetESP()
-		return
-	end
-
-	local CurrentRooms = Workspace:FindFirstChild("CurrentRooms")
-	if not CurrentRooms then return end
-
-	for item, hl in pairs(closetESPMap) do
-		if not item.Parent or not item:IsDescendantOf(Workspace) then
-			if hl then hl:Destroy() end
-			closetESPMap[item] = nil
-		end
-	end
-
-	for _, room in pairs(CurrentRooms:GetChildren()) do
-		for _, item in pairs(room:GetDescendants()) do
-			if item:IsA("Model") then
-				local name = item.Name:lower()
-				if name:find("wardrobe") or name:find("bed") or name:find("closet") or name:find("locker") or name:find("stutteringdesk") then
-					if not closetESPMap[item] then
-						local hl = Instance.new("Highlight")
-						hl.Name = "ClosetHL"
-						hl.FillColor = Color3.fromRGB(255, 120, 0)
-						hl.FillTransparency = 0.7
-						hl.OutlineColor = Color3.fromRGB(255, 140, 0)
-						hl.OutlineTransparency = 0
-						hl.Adornee = item
-						hl.Parent = item
-						closetESPMap[item] = hl
-					end
-
-					local part = item.PrimaryPart or item:FindFirstChildOfClass("BasePart")
-					if part then
-						AddTopTracer(part.Position, Color3.fromRGB(255, 140, 0))
-					end
-				end
-			end
-		end
-	end
-end
-
--- KEY & TOOL ESP (Chỉ bắt đúng vật phẩm tương tác, loại bỏ bảng)
-local keyESPMap = {}
-
-local function ClearKeyESP()
-	for obj, data in pairs(keyESPMap) do
-		if data.Highlight then data.Highlight:Destroy() end
-		if data.BB then data.BB:Destroy() end
-	end
-	table.clear(keyESPMap)
-end
-
-local function ScanKeyAndTools()
-	if not KeyESPEnabled then
-		ClearKeyESP()
-		return
-	end
-
-	local CurrentRooms = Workspace:FindFirstChild("CurrentRooms")
-	if not CurrentRooms then return end
-
-	local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom")) or 0
-
-	for item, data in pairs(keyESPMap) do
-		if not item.Parent or not item:IsDescendantOf(Workspace) then
-			if data.Highlight then data.Highlight:Destroy() end
-			if data.BB then data.BB:Destroy() end
-			keyESPMap[item] = nil
-		end
-	end
-
-	for _, room in pairs(CurrentRooms:GetChildren()) do
-		local roomNum = tonumber(room.Name)
-		if roomNum and roomNum >= currentRoomNum then
-			for _, item in pairs(room:GetDescendants()) do
-				if item:IsA("Model") or item:IsA("BasePart") then
-					local name = item.Name:lower()
-					
-					local isKey = (name == "keyob" or name == "key" or (name:find("key") and not name:find("keybackboard") and not name:find("keyholder") and not name:find("display"))) or name:find("lockpick")
-					local isLever = name:find("lever") or name:find("switch")
-					local isBox = name:find("livehintbook") or name:find("fuseholder") or name:find("electricalkey") or name:find("fuse")
-
-					if (isKey or isLever or isBox) and not keyESPMap[item] then
-						local targetPart = item:IsA("Model") and (item.PrimaryPart or item:FindFirstChild("Handle") or item:FindFirstChildOfClass("BasePart")) or item
-						
-						if targetPart then
-							local data = {}
-							local color = Color3.fromRGB(255, 215, 0)
-							local textStr = "Key"
-
-							if isLever then
-								color = Color3.fromRGB(0, 255, 120)
-								textStr = "Cần gạt"
-							elseif isBox then
-								color = Color3.fromRGB(0, 255, 120)
-								textStr = "Box"
-							end
-
-							local hl = Instance.new("Highlight")
-							hl.FillColor = color
-							hl.FillTransparency = 0.5
-							hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-							hl.OutlineTransparency = 0
-							hl.Adornee = item
-							hl.Parent = item
-							data.Highlight = hl
-
-							local bb = Instance.new("BillboardGui")
-							bb.Size = UDim2.new(0, 100, 0, 30)
-							bb.AlwaysOnTop = true
-							bb.StudsOffset = Vector3.new(0, 2, 0)
-							bb.Adornee = targetPart
-							bb.Parent = targetPart
-
-							local txt = Instance.new("TextLabel")
-							txt.Size = UDim2.new(1, 0, 1, 0)
-							txt.BackgroundTransparency = 1
-							txt.Text = textStr
-							txt.TextColor3 = color
-							txt.TextSize = 15
-							txt.Font = Enum.Font.Code
-							txt.Parent = bb
-
-							local txtStroke = Instance.new("UIStroke")
-							txtStroke.Color = Color3.fromRGB(255, 255, 255)
-							txtStroke.Thickness = 1.2
-							txtStroke.Parent = txt
-
-							data.BB = bb
-							data.TargetPart = targetPart
-							data.Color = color
-							keyESPMap[item] = data
-						end
-					end
-
-					if keyESPMap[item] and keyESPMap[item].TargetPart then
-						AddTopTracer(keyESPMap[item].TargetPart.Position, keyESPMap[item].Color)
-					end
-				end
-			end
-		end
-	end
-end
-
--- ENTITY ESP (Đã khắc phục hoàn toàn lỗi lọt sang cửa sổ, vẽ viền đỏ chuẩn xác)
-local entityESPMap = {}
-
-local function CleanEntityName(rawName)
-	local cleaned = rawName:gsub("Moving", ""):gsub("Rig", ""):gsub("%d", "")
-	return string.upper(cleaned)
-end
-
-local function CheckAndRegisterEntity(obj)
-	if not obj or not obj:IsA("Model") then return end
-	if Players:GetPlayerFromCharacter(obj) then return end
-
-	local name = obj.Name:lower()
-	local validEntities = {"rush", "ambush", "seek", "eyes", "figure", "screech", "halt", "dupe", "a-60", "a-120", "a-90", "snare", "jack"}
-	local isEntity = false
-
-	for _, v in ipairs(validEntities) do
-		if name:find(v) then
-			isEntity = true
-			break
-		end
-	end
-
-	if isEntity and not entityESPMap[obj] then
-		local displayName = CleanEntityName(obj.Name)
-		ShowEntityNotification(displayName)
-
-		local primaryPart = obj.PrimaryPart or obj:FindFirstChild("HumanoidRootPart") or obj:FindFirstChildOfClass("BasePart")
-		
-		if primaryPart then
-			local data = {}
-
-			local hl = Instance.new("Highlight")
-			hl.Name = "EntityHL"
-			hl.FillColor = Color3.fromRGB(255, 30, 30)
-			hl.FillTransparency = 0.5
-			hl.OutlineColor = Color3.fromRGB(255, 0, 0)
-			hl.OutlineTransparency = 0
-			hl.Adornee = obj
-			hl.Parent = hl
-			-- Đảm bảo luôn hiển thị xuyên thấu vượt trội
-			hl.Enabled = true
-			hl.Parent = obj
-			data.Highlight = hl
-
-			local bb = Instance.new("BillboardGui")
-			bb.Name = "EntityBB"
-			bb.Size = UDim2.new(0, 160, 0, 40)
-			bb.AlwaysOnTop = true
-			bb.Adornee = primaryPart
-			bb.Parent = primaryPart
-
-			local txt = Instance.new("TextLabel")
-			txt.Name = "Label"
-			txt.Size = UDim2.new(1, 0, 1, 0)
-			txt.BackgroundTransparency = 1
-			txt.Text = displayName
-			txt.TextColor3 = Color3.fromRGB(255, 50, 50)
-			txt.TextSize = 14
-			txt.Font = Enum.Font.Code
-			txt.Parent = bb
-			data.BB = bb
-			data.TargetPart = primaryPart
-			data.Color = Color3.fromRGB(255, 30, 30)
-
-			entityESPMap[obj] = data
-
-			obj.Destroying:Connect(function()
-				if entityESPMap[obj] then
-					if entityESPMap[obj].Highlight then entityESPMap[obj].Highlight:Destroy() end
-					if entityESPMap[obj].BB then entityESPMap[obj].BB:Destroy() end
-					entityESPMap[obj] = nil
-				end
-			end)
-		end
-	end
-end
-
-Workspace.ChildAdded:Connect(function(child)
-	task.defer(function()
-		CheckAndRegisterEntity(child)
-	end)
+EspLeft:AddToggle("DoorEspToggle", {
+    Text = "Door Tracker (ESP)", Default = false, Tooltip = "Hiển thị cửa hiện tại và tiếp theo"
+}):OnChanged(function(Value)
+    if Value then
+        local throttle = 0
+        local conn
+        conn = RunService.RenderStepped:Connect(function()
+            throttle = throttle + 1
+            if throttle % 3 ~= 0 then return end
+            
+            local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom"))
+            local rooms = Workspace:FindFirstChild("CurrentRooms")
+            if not currentRoomNum or not rooms then return end
+            
+            local activeDoors = {}
+            for i = 0, 1 do
+                local roomObj = rooms:FindFirstChild(tostring(currentRoomNum + i))
+                if roomObj and roomObj:FindFirstChild("Door") then
+                    activeDoors[roomObj.Door] = tostring(currentRoomNum + i)
+                end
+            end
+            
+            for door, data in pairs(doorESPTracks) do
+                if not activeDoors[door] then
+                    if data.hl then data.hl:Destroy() end
+                    if data.bb then data.bb:Destroy() end
+                    doorESPTracks[door] = nil
+                end
+            end
+            
+            local char = LocalPlayer.Character
+            local hrp = char and char:FindFirstChild("HumanoidRootPart")
+            if not hrp then return end
+            
+            for door, roomName in pairs(activeDoors) do
+                local part = door:FindFirstChild("Door") or door:FindFirstChildWhichIsA("BasePart")
+                if part then
+                    if not doorESPTracks[door] then
+                        local hl = Instance.new("Highlight")
+                        hl.FillTransparency = 0.6
+                        hl.OutlineTransparency = 0
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Parent = door
+                        
+                        local bb = Instance.new("BillboardGui")
+                        bb.Size = UDim2.new(0, 180, 0, 40)
+                        bb.StudsOffset = Vector3.new(0, 2.5, 0)
+                        bb.AlwaysOnTop = true
+                        bb.MaxDistance = 500
+                        
+                        local tl = Instance.new("TextLabel")
+                        tl.Size = UDim2.new(1, 0, 1, 0)
+                        tl.BackgroundTransparency = 1
+                        tl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                        tl.TextStrokeTransparency = 0
+                        tl.TextSize = 14
+                        tl.Font = Enum.Font.FredokaOne
+                        tl.Parent = bb
+                        bb.Parent = part
+                        
+                        doorESPTracks[door] = {hl = hl, bb = bb, label = tl}
+                    end
+                    
+                    local data = doorESPTracks[door]
+                    local dist = math.floor((hrp.Position - part.Position).Magnitude)
+                    local locked = checkDoorLocked(door)
+                    local roomPrefix = (currentLanguage == "English") and "Room" or "Phòng"
+                    local lockStr = locked and ((currentLanguage == "English") and " [Locked]" or " [Khóa]") or ""
+                    
+                    data.label.Text = string.format("%s %s%s [%dm]", roomPrefix, roomName, lockStr, dist)
+                    if locked then
+                        data.label.TextColor3 = Color3.fromRGB(255, 50, 50)
+                        data.hl.FillColor = Color3.fromRGB(255, 50, 50)
+                        data.hl.OutlineColor = Color3.fromRGB(255, 50, 50)
+                    else
+                        data.label.TextColor3 = espColor
+                        data.hl.FillColor = espColor
+                        data.hl.OutlineColor = espColor
+                    end
+                end
+            end
+        end)
+        doorESPTracks._connection = conn
+    else
+        if doorESPTracks._connection then
+            doorESPTracks._connection:Disconnect()
+            doorESPTracks._connection = nil
+        end
+        for _, data in pairs(doorESPTracks) do
+            if type(data) == "table" then
+                if data.hl then data.hl:Destroy() end
+                if data.bb then data.bb:Destroy() end
+            end
+        end
+        doorESPTracks = {}
+    end
 end)
 
-for _, child in pairs(Workspace:GetChildren()) do
-	CheckAndRegisterEntity(child)
-end
+EspLeft:AddLabel("ESP Color"):AddColorPicker("DoorEspColor", {
+    Default = Color3.fromRGB(0, 255, 200), Title = "Màu ESP",
+    Callback = function(v) espColor = v end
+})
 
-local function UpdateEntityVisibility()
-	for obj, data in pairs(entityESPMap) do
-		if obj and obj.Parent then
-			local activeState = EntityESPEnabled
-			data.Highlight.Enabled = activeState
-			data.BB.Enabled = activeState
-			
-			if activeState then
-				if data.BB and data.BB:FindFirstChild("Label") then
-					local primaryPart = obj.PrimaryPart or obj:FindFirstChildOfClass("BasePart")
-					local char = LocalPlayer.Character
-					if primaryPart and char and char:FindFirstChild("HumanoidRootPart") then
-						local dist = math.floor((primaryPart.Position - char.HumanoidRootPart.Position).Magnitude)
-						data.BB.Label.Text = CleanEntityName(obj.Name) .. " [" .. dist .. "m]"
-					end
-				end
-				if data.TargetPart then
-					AddTopTracer(data.TargetPart.Position, data.Color)
-				end
-			end
-		else
-			if data.Highlight then data.Highlight:Destroy() end
-			if data.BB then data.BB:Destroy() end
-			entityESPMap[obj] = nil
-		end
-	end
-end
+-- ENTITY ESP (An toàn bộ nhớ, hủy toàn bộ connection khi tắt toggle)
+local allEntities = {
+    ["rush"] = {vi = "Tấn công nhanh", en = "Rush", enabled = true},
+    ["ambush"] = {vi = "Tấn công bất ngờ", en = "Ambush", enabled = true},
+    ["sally"] = {vi = "Sally", en = "Sally", enabled = true},
+    ["figure"] = {vi = "Con rối", en = "Figure", enabled = true},
+    ["seek"] = {vi = "Mắt đuổi", en = "Seek", enabled = true},
+    ["eyes"] = {vi = "Ánh mắt", en = "Eyes", enabled = true},
+    ["halt"] = {vi = "Dừng lại", en = "Halt", enabled = true},
+    ["glitch"] = {vi = "Lỗi hệ thống", en = "Glitch", enabled = true},
+    ["dupe"] = {vi = "Cửa giả", en = "Dupe", enabled = true},
+    ["screech"] = {vi = "Tiếng thét", en = "Screech", enabled = true},
+    ["timothy"] = {vi = "Nhện nhện", en = "Timothy", enabled = true},
+    ["a60"] = {vi = "A-60", en = "A-60", enabled = true},
+    ["a90"] = {vi = "A-90", en = "A-90", enabled = true},
+    ["a120"] = {vi = "A-120", en = "A-120", enabled = true}
+}
 
--- PLAYER ESP (280 studs)
-local playerESPMap = {}
+local entityEspToggle = EspLeft:AddToggle("EntityEspToggle", {
+    Text = "Entity ESP (Advanced)", Default = false, Tooltip = "Vẽ thực thể thông minh"
+})
 
-local function ClearPlayerESP()
-	for plr, data in pairs(playerESPMap) do
-		if data.Highlight then data.Highlight:Destroy() end
-		if data.BB then data.BB:Destroy() end
-	end
-	table.clear(playerESPMap)
-end
-
-local function UpdatePlayerESP()
-	if not PlayerESPEnabled then
-		ClearPlayerESP()
-		return
-	end
-
-	local localChar = LocalPlayer.Character
-	local localHRP = localChar and localChar:FindFirstChild("HumanoidRootPart")
-
-	for _, player in pairs(Players:GetPlayers()) do
-		if player ~= LocalPlayer then
-			local char = player.Character
-			local hrp = char and char:FindFirstChild("HumanoidRootPart")
-
-			if char and hrp and localHRP then
-				local dist = (hrp.Position - localHRP.Position).Magnitude
-
-				if dist <= 280 then
-					if not playerESPMap[player] then
-						local data = {}
-
-						local hl = Instance.new("Highlight")
-						hl.Name = "PlayerHL"
-						hl.FillColor = Color3.fromRGB(255, 255, 255)
-						hl.FillTransparency = 0.8
-						hl.OutlineColor = Color3.fromRGB(255, 255, 255)
-						hl.OutlineTransparency = 0
-						hl.Adornee = char
-						hl.Parent = char
-						data.Highlight = hl
-
-						local bb = Instance.new("BillboardGui")
-						bb.Size = UDim2.new(0, 150, 0, 30)
-						bb.AlwaysOnTop = true
-						bb.StudsOffset = Vector3.new(0, 3, 0)
-						bb.Adornee = hrp
-						bb.Parent = hrp
-
-						local txt = Instance.new("TextLabel")
-						txt.Name = "Label"
-						txt.Size = UDim2.new(1, 0, 1, 0)
-						txt.BackgroundTransparency = 1
-						txt.Text = player.DisplayName .. " [" .. math.floor(dist) .. "m]"
-						txt.TextColor3 = Color3.fromRGB(255, 255, 255)
-						txt.TextSize = 14
-						txt.Font = Enum.Font.Code
-						txt.Parent = bb
-
-						local txtStroke = Instance.new("UIStroke")
-						txtStroke.Color = Color3.fromRGB(0, 0, 0)
-						txtStroke.Thickness = 1.2
-						txtStroke.Parent = txt
-
-						data.BB = bb
-						data.TargetPart = hrp
-						data.Color = Color3.fromRGB(255, 255, 255)
-						playerESPMap[player] = data
-					else
-						local data = playerESPMap[player]
-						if data.BB:FindFirstChild("Label") then
-							data.BB.Label.Text = player.DisplayName .. " [" .. math.floor(dist) .. "m]"
-						end
-					end
-
-					if playerESPMap[player] and playerESPMap[player].TargetPart then
-						AddTopTracer(playerESPMap[player].TargetPart.Position, playerESPMap[player].Color)
-					end
-				else
-					if playerESPMap[player] then
-						if playerESPMap[player].Highlight then playerESPMap[player].Highlight:Destroy() end
-						if playerESPMap[player].BB then playerESPMap[player].BB:Destroy() end
-						playerESPMap[player] = nil
-					end
-				end
-			else
-				if playerESPMap[player] then
-					if playerESPMap[player].Highlight then playerESPMap[player].Highlight:Destroy() end
-					if playerESPMap[player].BB then playerESPMap[player].BB:Destroy() end
-					playerESPMap[player] = nil
-				end
-			end
-		end
-	end
-end
-
--- TỐI ƯU HÓA VÒNG LẶP CHỐNG LAG CPU
-task.spawn(function()
-	while true do
-		ScanClosets()
-		ScanKeyAndTools()
-		task.wait(0.6)
-	end
+EspLeft:AddButton("ConfigEntitiesBtn", "⚙️ Chọn Entity ESP (Bảng Ngang)", function()
+    local ConfigWindow = Obsidian:CreateWindow({
+        Title = "Danh sách Entity ESP", SubTitle = "Chọn thực thể",
+        TabWidth = 100, Size = UDim2.new(0, 580, 0, 340), Center = true, AutoShow = true, MenuFadeTime = 0.15
+    })
+    local ConfigTab = ConfigWindow:AddTab("Entities", "list")
+    local ConfigGroup = ConfigTab:AddLeftGroupbox("Quản lý tùy chọn")
+    
+    ConfigGroup:AddButton("SelectAllEnt", "✔ Chọn Tất Cả", function()
+        for _, data in pairs(allEntities) do data.enabled = true end
+    end)
+    ConfigGroup:AddButton("DeselectAllEnt", "❌ Bỏ Chọn Tất Cả", function()
+        for _, data in pairs(allEntities) do data.enabled = false end
+    end)
+    
+    local ConfigRightGroup = ConfigTab:AddRightGroupbox("Bộ lọc chi tiết")
+    for k, data in pairs(allEntities) do
+        ConfigRightGroup:AddToggle("Ent_"..k, {
+            Text = data.en .. " (" .. data.vi .. ")", Default = data.enabled,
+            Callback = function(v) data.enabled = v end
+        })
+    end
 end)
 
-RunService.RenderStepped:Connect(function()
-	ClearTracers()
-	activeTracerIndex = 0
+local trackedEntities = {}
+local activeConnections = {}
 
-	UpdateDoorsESP()
-	UpdateEntityVisibility()
-	UpdatePlayerESP()
+local function registerEntity(obj)
+    if not entityEspToggle.Value or trackedEntities[obj] then return end
+    if not obj:IsA("Model") and not obj:IsA("BasePart") then return end
+    
+    local rawName = obj.Name:lower()
+    local matchedKey = nil
+    for k, _ in pairs(allEntities) do
+        if rawName:find(k) then matchedKey = k break end
+    end
+    
+    if matchedKey and allEntities[matchedKey].enabled then
+        trackedEntities[obj] = true
+        task.spawn(function()
+            local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart"))
+            if not part then
+                task.delay(0.2, function()
+                    if obj.Parent then part = obj:FindFirstChildWhichIsA("BasePart") end
+                end)
+            end
+            if not part then return end
+            
+            local hl = Instance.new("Highlight")
+            hl.FillColor = Color3.fromRGB(255, 0, 0)
+            hl.OutlineColor = Color3.fromRGB(255, 0, 0)
+            hl.FillTransparency = 0.4
+            hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+            hl.Parent = obj
+            
+            local bb = Instance.new("BillboardGui")
+            bb.Size = UDim2.new(0, 160, 0, 40)
+            bb.StudsOffset = Vector3.new(0, 3, 0)
+            bb.AlwaysOnTop = true
+            bb.MaxDistance = 1500
+            
+            local tl = Instance.new("TextLabel")
+            tl.Size = UDim2.new(1, 0, 1, 0)
+            tl.BackgroundTransparency = 1
+            tl.TextColor3 = Color3.fromRGB(255, 0, 0)
+            tl.TextStrokeTransparency = 0
+            tl.TextSize = 14
+            tl.Font = Enum.Font.FredokaOne
+            tl.Parent = bb
+            bb.Parent = part
+            
+            local throttle = 0
+            local conn
+            conn = RunService.RenderStepped:Connect(function()
+                if not obj.Parent or not entityEspToggle.Value or not allEntities[matchedKey].enabled then
+                    if hl then hl:Destroy() end
+                    if bb then bb:Destroy() end
+                    if conn then conn:Disconnect() end
+                    trackedEntities[obj] = nil
+                    return
+                end
+                throttle = throttle + 1
+                if throttle % 2 ~= 0 then return end
+                
+                local char = LocalPlayer.Character
+                local hrp = char and char:FindFirstChild("HumanoidRootPart")
+                if hrp and part then
+                    local dist = math.floor((hrp.Position - part.Position).Magnitude)
+                    local info = allEntities[matchedKey]
+                    local cName = (currentLanguage == "English") and info.en or info.vi
+                    tl.Text = string.format("%s [%dm]", cName, dist)
+                end
+            end)
+            table.insert(activeConnections, conn)
+        end)
+    end
+end
+
+entityEspToggle:OnChanged(function(Value)
+    if Value then
+        table.insert(activeConnections, Workspace.DescendantAdded:Connect(registerEntity))
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            registerEntity(obj)
+        end
+    else
+        for _, conn in ipairs(activeConnections) do
+            if typeof(conn) == "RBXScriptConnection" then conn:Disconnect() end
+        end
+        activeConnections = {}
+        for obj, _ in pairs(trackedEntities) do
+            if obj then
+                for _, v in pairs(obj:GetDescendants()) do
+                    if v:IsA("Highlight") or v:IsA("BillboardGui") then v:Destroy() end
+                end
+            end
+        end
+        trackedEntities = {}
+    end
+end)
+
+-- PLAYER ESP (Khắc phục triệt để lỗi bỏ sót khi tắt)
+local playerEspToggle = EspRight:AddToggle("PlayerEspToggle", {
+    Text = "Player ESP (Carton Fill)", Default = false, Tooltip = "Vẽ người chơi"
+})
+local trackedPlayers = {}
+
+playerEspToggle:OnChanged(function(Value)
+    if Value then
+        local function setupPlayer(plr)
+            if plr == LocalPlayer then return end
+            local function onChar(char)
+                if trackedPlayers[plr] then
+                    if trackedPlayers[plr].hl then trackedPlayers[plr].hl:Destroy() end
+                    if trackedPlayers[plr].bb then trackedPlayers[plr].bb:Destroy() end
+                end
+                local hl = Instance.new("Highlight")
+                hl.FillColor = Color3.fromRGB(190, 130, 80)
+                hl.OutlineColor = Color3.fromRGB(240, 180, 110)
+                hl.FillTransparency = 0.4
+                hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                hl.Parent = char
+                
+                local head = char:WaitForChild("Head", 3)
+                if head then
+                    local bb = Instance.new("BillboardGui")
+                    bb.Size = UDim2.new(0, 120, 0, 40)
+                    bb.StudsOffset = Vector3.new(0, 2.5, 0)
+                    bb.AlwaysOnTop = true
+                    bb.MaxDistance = 500
+                    
+                    local tl = Instance.new("TextLabel")
+                    tl.Size = UDim2.new(1, 0, 1, 0)
+                    tl.BackgroundTransparency = 1
+                    tl.TextColor3 = Color3.fromRGB(255, 210, 140)
+                    tl.TextStrokeTransparency = 0
+                    tl.TextSize = 14
+                    tl.Font = Enum.Font.FredokaOne
+                    tl.Text = plr.Name
+                    tl.Parent = bb
+                    bb.Parent = head
+                    trackedPlayers[plr] = {hl = hl, bb = bb}
+                end
+            end
+            if plr.Character then onChar(plr.Character) end
+            plr.CharacterAdded:Connect(onChar)
+        end
+        for _, p in ipairs(Players:GetPlayers()) do setupPlayer(p) end
+        trackedPlayers._playerConn = Players.PlayerAdded:Connect(setupPlayer)
+    else
+        if trackedPlayers._playerConn then trackedPlayers._playerConn:Disconnect() end
+        for plr, data in pairs(trackedPlayers) do
+            if type(data) == "table" then
+                if data.hl then data.hl:Destroy() end
+                if data.bb then data.bb:Destroy() end
+            end
+        end
+        trackedPlayers = {}
+    end
+end)
+
+-- HIDDEN SUPPORT ESP
+local hiddenSupportToggle = EspRight:AddToggle("HiddenSupportToggle", {
+    Text = "Hidden Support ESP", Default = false,
+    Tooltip = "Vẽ tủ trốn / giường trốn màu vàng"
+})
+
+local trackedHidden = {}
+local hiddenConn = nil
+
+hiddenSupportToggle:OnChanged(function(Value)
+    if Value then
+        local throttle = 0
+        hiddenConn = RunService.RenderStepped:Connect(function()
+            throttle = throttle + 1
+            if throttle % 4 ~= 0 then return end
+            
+            local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom"))
+            if not currentRoomNum then return end
+            
+            for i = 0, 1 do
+                local roomObj = Workspace.CurrentRooms:FindFirstChild(tostring(currentRoomNum + i))
+                if roomObj then
+                    for _, descendant in ipairs(roomObj:GetDescendants()) do
+                        local name = descendant.Name:lower()
+                        if name:find("wardrobe") or name:find("closet") or name:find("bed") or name:find("hide") then
+                            if not trackedHidden[descendant] then
+                                local part = descendant:IsA("BasePart") and descendant or descendant:FindFirstChildWhichIsA("BasePart")
+                                if part then
+                                    local hl = Instance.new("Highlight")
+                                    hl.FillColor = Color3.fromRGB(255, 220, 0)
+                                    hl.OutlineColor = Color3.fromRGB(255, 255, 0)
+                                    hl.FillTransparency = 0.5
+                                    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                                    hl.Parent = descendant
+                                    
+                                    local bb = Instance.new("BillboardGui")
+                                    bb.Size = UDim2.new(0, 100, 0, 30)
+                                    bb.StudsOffset = Vector3.new(0, 2, 0)
+                                    bb.AlwaysOnTop = true
+                                    bb.MaxDistance = 400
+                                    local tl = Instance.new("TextLabel")
+                                    tl.Size = UDim2.new(1, 0, 1, 0)
+                                    tl.BackgroundTransparency = 1
+                                    tl.TextColor3 = Color3.fromRGB(255, 220, 0)
+                                    tl.TextStrokeTransparency = 0
+                                    tl.TextSize = 13
+                                    tl.Font = Enum.Font.FredokaOne
+                                    tl.Text = (currentLanguage == "English") and "Hiding Spot" or "Chỗ Trốn"
+                                    tl.Parent = bb
+                                    bb.Parent = part
+                                    
+                                    trackedHidden[descendant] = {hl = hl, bb = bb, label = tl}
+                                end
+                            else
+                                if trackedHidden[descendant] and trackedHidden[descendant].label then
+                                    trackedHidden[descendant].label.Text = (currentLanguage == "English") and "Hiding Spot" or "Chỗ Trốn"
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        if hiddenConn then hiddenConn:Disconnect() hiddenConn = nil end
+        for obj, data in pairs(trackedHidden) do
+            if data.hl then data.hl:Destroy() end
+            if data.bb then data.bb:Destroy() end
+        end
+        trackedHidden = {}
+    end
+end)
+
+-- ITEM ESP
+local itemEspToggle = ObjectsRight:AddToggle("ItemEspToggle", {
+    Text = "Item ESP (Purple & No Keys)", Default = false,
+    Tooltip = "Vẽ item tương tác màu tím, loại bỏ tuyệt đối Key"
+})
+
+local itemColor = Color3.fromRGB(180, 50, 255)
+ObjectsRight:AddLabel("Item Color"):AddColorPicker("ItemEspColor", {
+    Default = Color3.fromRGB(180, 50, 255),
+    Title = "Màu Item",
+    Callback = function(v) itemColor = v end
+})
+
+local trackedItems = {}
+local itemConn = nil
+itemEspToggle:OnChanged(function(Value)
+    if Value then
+        local throttle = 0
+        itemConn = RunService.RenderStepped:Connect(function()
+            throttle = throttle + 1
+            if throttle % 4 ~= 0 then return end
+            
+            local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom"))
+            if not currentRoomNum then return end
+            
+            local roomObj = Workspace.CurrentRooms:FindFirstChild(tostring(currentRoomNum))
+            if not roomObj then return end
+            
+            local currentRoomItems = {}
+            for _, descendant in ipairs(roomObj:GetDescendants()) do
+                local name = descendant.Name:lower()
+                if not name:find("key") and not name:find("padlock") then
+                    local hasPrompt = descendant:FindFirstChildWhichIsA("ProximityPrompt", true) or descendant:IsA("ProximityPrompt")
+                    if hasPrompt then
+                        local validItems = {"candle", "lighter", "bandaid", "cross", "crucifix", "gun", "ammo", "bomb", "glowstick", "book", "battery", "shears"}
+                        local isValid = false
+                        for _, k in ipairs(validItems) do
+                            if name:find(k) then isValid = true break end
+                        end
+                        if isValid then
+                            currentRoomItems[descendant] = true
+                        end
+                    end
+                end
+            end
+            
+            for obj, data in pairs(trackedItems) do
+                if not currentRoomItems[obj] or not obj.Parent then
+                    if data.hl then data.hl:Destroy() end
+                    if data.bb then data.bb:Destroy() end
+                    trackedItems[obj] = nil
+                end
+            end
+            
+            for obj, _ in pairs(currentRoomItems) do
+                if not trackedItems[obj] then
+                    local part = obj:IsA("BasePart") and obj or obj:FindFirstChildWhichIsA("BasePart")
+                    if part then
+                        local hl = Instance.new("Highlight")
+                        hl.FillColor = itemColor
+                        hl.OutlineColor = itemColor
+                        hl.FillTransparency = 0.5
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Parent = obj
+                        
+                        local bb = Instance.new("BillboardGui")
+                        bb.Size = UDim2.new(0, 100, 0, 30)
+                        bb.StudsOffset = Vector3.new(0, 2, 0)
+                        bb.AlwaysOnTop = true
+                        bb.MaxDistance = 400
+                        local tl = Instance.new("TextLabel")
+                        tl.Size = UDim2.new(1, 0, 1, 0)
+                        tl.BackgroundTransparency = 1
+                        tl.TextColor3 = itemColor
+                        tl.TextStrokeTransparency = 0
+                        tl.TextSize = 13
+                        tl.Font = Enum.Font.FredokaOne
+                        tl.Text = obj.Name
+                        tl.Parent = bb
+                        bb.Parent = part
+                        
+                        trackedItems[obj] = {hl = hl, bb = bb}
+                    end
+                end
+            end
+        end)
+    else
+        if itemConn then itemConn:Disconnect() itemConn = nil end
+        for obj, data in pairs(trackedItems) do
+            if data.hl then data.hl:Destroy() end
+            if data.bb then data.bb:Destroy() end
+        end
+        trackedItems = {}
+    end
+end)
+
+-- OBJECTS ESP
+local objectsEspToggle = ObjectsLeft:AddToggle("ObjectsEspToggle", {
+    Text = "Objects ESP (Key & Box)", Default = false,
+    Tooltip = "Vẽ Key Door, Hộp điện, Rương"
+})
+
+local objectsColor = Color3.fromRGB(0, 255, 100)
+ObjectsLeft:AddLabel("Objects Color"):AddColorPicker("ObjectsEspColor", {
+    Default = Color3.fromRGB(0, 255, 100),
+    Title = "Màu Objects",
+    Callback = function(v) objectsColor = v end
+})
+
+local trackedObjects = {}
+local objectsConn = nil
+objectsEspToggle:OnChanged(function(Value)
+    if Value then
+        local throttle = 0
+        objectsConn = RunService.RenderStepped:Connect(function()
+            throttle = throttle + 1
+            if throttle % 4 ~= 0 then return end
+            
+            local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom"))
+            if not currentRoomNum then return end
+            
+            local roomObj = Workspace.CurrentRooms:FindFirstChild(tostring(currentRoomNum))
+            if not roomObj then return end
+            
+            local currentRoomObjects = {}
+            for _, descendant in ipairs(roomObj:GetDescendants()) do
+                local name = descendant.Name:lower()
+                if not name:find("drawer") and not name:find("locker") then
+                    local hasPrompt = descendant:FindFirstChildWhichIsA("ProximityPrompt", true) or descendant:IsA("ProximityPrompt")
+                    if hasPrompt then
+                        local validKeys = {"key", "doorkey", "keydoor", "electrical", "box", "chest", "breaker", "padlock", "lever"}
+                        local isValid = false
+                        for _, k in ipairs(validKeys) do
+                            if name:find(k) then isValid = true break end
+                        end
+                        if isValid then
+                            currentRoomObjects[descendant] = true
+                        end
+                    end
+                end
+            end
+            
+            for obj, data in pairs(trackedObjects) do
+                if not currentRoomObjects[obj] or not obj.Parent then
+                    if data.hl then data.hl:Destroy() end
+                    if data.bb then data.bb:Destroy() end
+                    trackedObjects[obj] = nil
+                end
+            end
+            
+            for obj, _ in pairs(currentRoomObjects) do
+                if not trackedObjects[obj] then
+                    local part = obj:IsA("BasePart") and obj or obj:FindFirstChildWhichIsA("BasePart")
+                    if part then
+                        local hl = Instance.new("Highlight")
+                        hl.FillColor = objectsColor
+                        hl.OutlineColor = objectsColor
+                        hl.FillTransparency = 0.5
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Parent = obj
+                        
+                        local bb = Instance.new("BillboardGui")
+                        bb.Size = UDim2.new(0, 110, 0, 30)
+                        bb.StudsOffset = Vector3.new(0, 2, 0)
+                        bb.AlwaysOnTop = true
+                        bb.MaxDistance = 400
+                        local tl = Instance.new("TextLabel")
+                        tl.Size = UDim2.new(1, 0, 1, 0)
+                        tl.BackgroundTransparency = 1
+                        tl.TextColor3 = objectsColor
+                        tl.TextStrokeTransparency = 0
+                        tl.TextSize = 14
+                        tl.Font = Enum.Font.FredokaOne
+                        local displayName = obj.Name
+                        if displayName:lower():find("key") then
+                            displayName = "Key Door"
+                        end
+                        tl.Text = displayName
+                        tl.Parent = bb
+                        bb.Parent = part
+                        
+                        trackedObjects[obj] = {hl = hl, bb = bb}
+                    end
+                end
+            end
+        end)
+    else
+        if objectsConn then objectsConn:Disconnect() objectsConn = nil end
+        for obj, data in pairs(trackedObjects) do
+            if data.hl then data.hl:Destroy() end
+            if data.bb then data.bb:Destroy() end
+        end
+        trackedObjects = {}
+    end
 end)
