@@ -70,6 +70,22 @@ local ObjectsLeft = Tabs.Objects:AddLeftGroupbox("Room Objects ESP")
 local ObjectsRight = Tabs.Objects:AddRightGroupbox("Filters")
 local SoundLeft = Tabs.Sound:AddLeftGroupbox("Entity Notification")
 local SoundRight = Tabs.Sound:AddRightGroupbox("Alert Settings")
+SoundLeft:AddToggle("Patch_SoundOn", {
+    Text = "Bật âm thanh thông báo",
+    Default = true,
+    Callback = function(v) _G.__soundEnabled = v end
+})
+_G.__soundEnabled = true
+
+SoundLeft:AddButton("Patch_TestSound", "🔊 Test Âm Thanh", function()
+    local s = Instance.new("Sound")
+    s.SoundId = "rbxassetid://9119802009"
+    s.Volume = 2
+    s.Parent = SoundService
+    s:Play()
+    task.delay(3, function() if s then s:Destroy() end end)
+    Obsidian:Notify({Title = "Test", Description = "Âm thanh + thông báo hoạt động!", Time = 3})
+end)
 local SettingsLeft = Tabs.Settings:AddLeftGroupbox("Ngôn ngữ / Language")
 local SettingsRight = Tabs.Settings:AddRightGroupbox("Menu Settings")
 
@@ -178,106 +194,89 @@ reachToggle:OnChanged(function(Value)
     end)
 end)
 
--- DOORS ESP
-local espColor = Color3.fromRGB(0, 255, 200)
+if not doorESPTracks[door] then
 local doorESPTracks = {}
+local doorConn = nil
 
 EspLeft:AddToggle("DoorEspToggle", {
-    Text = "Door Tracker (ESP)", Default = false, Tooltip = "Hiển thị cửa hiện tại và tiếp theo"
-}):OnChanged(function(Value)
-    if Value then
-        local throttle = 0
-        local conn
-        conn = RunService.RenderStepped:Connect(function()
-            throttle = throttle + 1
-            if throttle % 3 ~= 0 then return end
-            
-            local currentRoomNum = tonumber(LocalPlayer:GetAttribute("CurrentRoom"))
-            local rooms = Workspace:FindFirstChild("CurrentRooms")
-            if not currentRoomNum or not rooms then return end
-            
-            local activeDoors = {}
-            for i = 0, 1 do
-                local roomObj = rooms:FindFirstChild(tostring(currentRoomNum + i))
-                if roomObj and roomObj:FindFirstChild("Door") then
-                    activeDoors[roomObj.Door] = tostring(currentRoomNum + i)
-                end
-            end
-            
-            for door, data in pairs(doorESPTracks) do
-                if not activeDoors[door] then
-                    if data.hl then data.hl:Destroy() end
-                    if data.bb then data.bb:Destroy() end
-                    doorESPTracks[door] = nil
-                end
-            end
-            
-            local char = LocalPlayer.Character
-            local hrp = char and char:FindFirstChild("HumanoidRootPart")
-            if not hrp then return end
-            
-            for door, roomName in pairs(activeDoors) do
-                local part = door:FindFirstChild("Door") or door:FindFirstChildWhichIsA("BasePart")
-                if part then
-                    if not doorESPTracks[door] then
-                        local hl = Instance.new("Highlight")
-                        hl.FillTransparency = 0.6
-                        hl.OutlineTransparency = 0
-                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                        hl.Parent = door
-                        
-                        local bb = Instance.new("BillboardGui")
-                        bb.Size = UDim2.new(0, 180, 0, 40)
-                        bb.StudsOffset = Vector3.new(0, 2.5, 0)
-                        bb.AlwaysOnTop = true
-                        bb.MaxDistance = 500
-                        
-                        local tl = Instance.new("TextLabel")
-                        tl.Size = UDim2.new(1, 0, 1, 0)
-                        tl.BackgroundTransparency = 1
-                        tl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
-                        tl.TextStrokeTransparency = 0
-                        tl.TextSize = 14
-                        tl.Font = Enum.Font.FredokaOne
-                        tl.Parent = bb
-                        bb.Parent = part
-                        
-                        doorESPTracks[door] = {hl = hl, bb = bb, label = tl}
-                    end
-                    
-                    local data = doorESPTracks[door]
-                    local dist = math.floor((hrp.Position - part.Position).Magnitude)
-                    local locked = checkDoorLocked(door)
-                    local roomPrefix = (currentLanguage == "English") and "Room" or "Phòng"
-                    local lockStr = locked and ((currentLanguage == "English") and " [Locked]" or " [Khóa]") or ""
-                    
-                    data.label.Text = string.format("%s %s%s [%dm]", roomPrefix, roomName, lockStr, dist)
-                    if locked then
-                        data.label.TextColor3 = Color3.fromRGB(255, 50, 50)
-                        data.hl.FillColor = Color3.fromRGB(255, 50, 50)
-                        data.hl.OutlineColor = Color3.fromRGB(255, 50, 50)
-                    else
-                        data.label.TextColor3 = espColor
-                        data.hl.FillColor = espColor
-                        data.hl.OutlineColor = espColor
-                    end
-                end
-            end
-        end)
-        doorESPTracks._connection = conn
-    else
-        if doorESPTracks._connection then
-            doorESPTracks._connection:Disconnect()
-            doorESPTracks._connection = nil
-        end
-        for _, data in pairs(doorESPTracks) do
-            if type(data) == "table" then
-                if data.hl then data.hl:Destroy() end
-                if data.bb then data.bb:Destroy() end
-            end
+    Text = "Door Hiển Thị", Default = false, Tooltip = "Hiển thị cửa hiện tại và tiếp theo"
+}):OnChanged(function(v)
+    if not v then
+        if doorConn then doorConn:Disconnect() doorConn = nil end
+        for door, data in pairs(doorESPTracks) do
+            if data.hl then data.hl:Destroy() end
+            if data.bb then data.bb:Destroy() end
         end
         doorESPTracks = {}
+        return
     end
+    local frame = 0
+    doorConn = RunService.RenderStepped:Connect(function()
+        frame = frame + 1
+        if frame % 3 ~= 0 then return end
+        local cur = tonumber(LocalPlayer:GetAttribute("CurrentRoom"))
+        local rooms = Workspace:FindFirstChild("CurrentRooms")
+        if not cur or not rooms then return end
+        local active = {}
+        for i = 0, 1 do
+            local r = rooms:FindFirstChild(tostring(cur + i))
+            if r and r:FindFirstChild("Door") then active[r.Door] = tostring(cur + i) end
+        end
+        for door, data in pairs(doorESPTracks) do
+            if not active[door] or not door.Parent then
+                if data.hl then data.hl:Destroy() end
+                if data.bb then data.bb:Destroy() end
+                doorESPTracks[door] = nil
+            end
+        end
+        local camPos = workspace.CurrentCamera.CFrame.Position
+        for door, roomName in pairs(active) do
+            local part = door:FindFirstChild("Door") or door:FindFirstChildWhichIsA("BasePart")
+            if part then
+                if not doorESPTracks[door] then
+                    local hl = Instance.new("Highlight")
+                    hl.FillTransparency = 0.6
+                    hl.OutlineTransparency = 0
+                    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    hl.Parent = door
+                    local bb = Instance.new("BillboardGui")
+                    bb.Adornee = part
+                    bb.Size = UDim2.new(0, 200, 0, 50)
+                    bb.StudsOffsetWorldSpace = Vector3.new(0, 2.5, 0)
+                    bb.AlwaysOnTop = true
+                    bb.MaxDistance = 2000
+                    bb.LightInfluence = 0
+                    bb.ResetOnSpawn = false
+                    bb.Parent = part
+                    local tl = Instance.new("TextLabel")
+                    tl.Size = UDim2.new(1, 0, 1, 0)
+                    tl.BackgroundTransparency = 1
+                    tl.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+                    tl.TextStrokeTransparency = 0
+                    tl.TextScaled = true
+                    tl.Font = Enum.Font.FredokaOne
+                    tl.Parent = bb
+                    local sc = Instance.new("UIScale")
+                    sc.Scale = 1.1
+                    sc.Parent = tl
+                    doorESPTracks[door] = {hl = hl, bb = bb, tl = tl, part = part}
+                end
+                local data = doorESPTracks[door]
+                local locked = checkDoorLocked(door)
+                local dist = math.floor((camPos - part.Position).Magnitude)
+                local prefix = (currentLanguage == "English") and "Room" or "Phòng"
+                local lockStr = locked and ((currentLanguage == "English") and " [Locked]" or " [Khóa]") or ""
+                if data.tl and data.tl.Parent then
+                    data.tl.Text = string.format("%s %s%s [%dm]", prefix, roomName, lockStr, dist)
+                    data.tl.TextColor3 = locked and Color3.fromRGB(255, 50, 50) or espColor
+                end
+                if data.hl then
+                    data.hl.FillColor = locked and Color3.fromRGB(255, 50, 50) or espColor
+                    data.hl.OutlineColor = locked and Color3.fromRGB(255, 50, 50) or espColor
+                end
+            end
+        end
+    end)
 end)
 
 EspLeft:AddLabel("ESP Color"):AddColorPicker("DoorEspColor", {
@@ -332,78 +331,86 @@ EspLeft:AddButton("ConfigEntitiesBtn", "⚙️ Chọn Entity ESP (Bảng Ngang)"
 end)
 
 local trackedEntities = {}
-local activeConnections = {}
+local entityDescConn = nil
+local entityHeartConn = nil
 
-local function registerEntity(obj)
-    if not entityEspToggle.Value or trackedEntities[obj] then return end
-    if not obj:IsA("Model") and not obj:IsA("BasePart") then return end
-    
-    local rawName = obj.Name:lower()
-    local matchedKey = nil
-    for k, _ in pairs(allEntities) do
-        if rawName:find(k) then matchedKey = k break end
+local function matchEntityKey(name)
+    local lower = name:lower()
+    for k, v in pairs(allEntities) do
+        if v.enabled and lower:find(k) then return k end
     end
-    
-    if matchedKey and allEntities[matchedKey].enabled then
-        trackedEntities[obj] = true
-        task.spawn(function()
-            local part = obj:IsA("BasePart") and obj or (obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart"))
-            if not part then
-                task.delay(0.2, function()
-                    if obj.Parent then part = obj:FindFirstChildWhichIsA("BasePart") end
-                end)
-            end
-            if not part then return end
-            
-            local hl = Instance.new("Highlight")
-            hl.FillColor = Color3.fromRGB(255, 0, 0)
-            hl.OutlineColor = Color3.fromRGB(255, 0, 0)
-            hl.FillTransparency = 0.4
-            hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-            hl.Parent = obj
-            
-            local bb = Instance.new("BillboardGui")
-            bb.Size = UDim2.new(0, 160, 0, 40)
-            bb.StudsOffset = Vector3.new(0, 3, 0)
-            bb.AlwaysOnTop = true
-            bb.MaxDistance = 1500
-            
-            local tl = Instance.new("TextLabel")
-            tl.Size = UDim2.new(1, 0, 1, 0)
-            tl.BackgroundTransparency = 1
-            tl.TextColor3 = Color3.fromRGB(255, 0, 0)
-            tl.TextStrokeTransparency = 0
-            tl.TextSize = 14
-            tl.Font = Enum.Font.FredokaOne
-            tl.Parent = bb
-            bb.Parent = part
-            
-            local throttle = 0
-            local conn
-            conn = RunService.RenderStepped:Connect(function()
-                if not obj.Parent or not entityEspToggle.Value or not allEntities[matchedKey].enabled then
-                    if hl then hl:Destroy() end
-                    if bb then bb:Destroy() end
-                    if conn then conn:Disconnect() end
-                    trackedEntities[obj] = nil
-                    return
-                end
-                throttle = throttle + 1
-                if throttle % 2 ~= 0 then return end
-                
-                local char = LocalPlayer.Character
-                local hrp = char and char:FindFirstChild("HumanoidRootPart")
-                if hrp and part then
-                    local dist = math.floor((hrp.Position - part.Position).Magnitude)
-                    local info = allEntities[matchedKey]
-                    local cName = (currentLanguage == "English") and info.en or info.vi
-                    tl.Text = string.format("%s [%dm]", cName, dist)
-                end
-            end)
-            table.insert(activeConnections, conn)
-        end)
-    end
+    return nil
 end
+
+local function attachEntity(obj, key)
+    if trackedEntities[obj] then return end
+    local part = obj:IsA("BasePart") and obj or obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+    if not part then return end
+    local bb = Instance.new("BillboardGui")
+    bb.Adornee = part
+    bb.Size = UDim2.new(0, 180, 0, 50)
+    bb.StudsOffsetWorldSpace = Vector3.new(0, 3, 0)
+    bb.AlwaysOnTop = true
+    bb.MaxDistance = 2000
+    bb.LightInfluence = 0
+    bb.ResetOnSpawn = false
+    bb.Parent = part
+    local tl = Instance.new("TextLabel")
+    tl.Size = UDim2.new(1, 0, 1, 0)
+    tl.BackgroundTransparency = 1
+    tl.TextColor3 = Color3.fromRGB(255, 0, 0)
+    tl.TextStrokeTransparency = 0
+    tl.TextScaled = true
+    tl.Font = Enum.Font.FredokaOne
+    tl.Text = allEntities[key].en
+    tl.Parent = bb
+    local sc = Instance.new("UIScale")
+    sc.Scale = 1.1
+    sc.Parent = tl
+    trackedEntities[obj] = {bb = bb, tl = tl, part = part, key = key}
+end
+
+local function detachEntity(obj)
+    local data = trackedEntities[obj]
+    if not data then return end
+    if data.bb then data.bb:Destroy() end
+    trackedEntities[obj] = nil
+end
+
+entityEspToggle:OnChanged(function(v)
+    if not v then
+        if entityDescConn then entityDescConn:Disconnect() entityDescConn = nil end
+        if entityHeartConn then entityHeartConn:Disconnect() entityHeartConn = nil end
+        for obj in pairs(trackedEntities) do detachEntity(obj) end
+        return
+    end
+    entityDescConn = Workspace.DescendantAdded:Connect(function(obj)
+        local key = matchEntityKey(obj.Name)
+        if key then task.defer(function() attachEntity(obj, key) end) end
+    end)
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        local key = matchEntityKey(obj.Name)
+        if key then attachEntity(obj, key) end
+    end
+    local frame = 0
+    entityHeartConn = RunService.Heartbeat:Connect(function()
+        frame = frame + 1
+        if frame % 3 ~= 0 then return end
+        local camPos = workspace.CurrentCamera.CFrame.Position
+        for obj, data in pairs(trackedEntities) do
+            if not obj.Parent or not data.part.Parent or not allEntities[data.key].enabled then
+                detachEntity(obj)
+            else
+                local dist = math.floor((camPos - data.part.Position).Magnitude)
+                local info = allEntities[data.key]
+                local label = (currentLanguage == "English") and info.en or info.vi
+                if data.tl and data.tl.Parent then
+                    data.tl.Text = string.format("%s [%dm]", label, dist)
+                end
+            end
+        end
+    end)
+end)
 
 entityEspToggle:OnChanged(function(Value)
     if Value then
@@ -427,64 +434,79 @@ entityEspToggle:OnChanged(function(Value)
     end
 end)
 
--- PLAYER ESP (Khắc phục triệt để lỗi bỏ sót khi tắt)
 local playerEspToggle = EspRight:AddToggle("PlayerEspToggle", {
-    Text = "Player ESP (Carton Fill)", Default = false, Tooltip = "Vẽ người chơi"
+    Text = "Player ESP", Default = false, Tooltip = "Vẽ người chơi"
 })
-local trackedPlayers = {}
 
-playerEspToggle:OnChanged(function(Value)
-    if Value then
-        local function setupPlayer(plr)
-            if plr == LocalPlayer then return end
-            local function onChar(char)
-                if trackedPlayers[plr] then
-                    if trackedPlayers[plr].hl then trackedPlayers[plr].hl:Destroy() end
-                    if trackedPlayers[plr].bb then trackedPlayers[plr].bb:Destroy() end
-                end
-                local hl = Instance.new("Highlight")
-                hl.FillColor = Color3.fromRGB(190, 130, 80)
-                hl.OutlineColor = Color3.fromRGB(240, 180, 110)
-                hl.FillTransparency = 0.4
-                hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                hl.Parent = char
-                
-                local head = char:WaitForChild("Head", 3)
-                if head then
-                    local bb = Instance.new("BillboardGui")
-                    bb.Size = UDim2.new(0, 120, 0, 40)
-                    bb.StudsOffset = Vector3.new(0, 2.5, 0)
-                    bb.AlwaysOnTop = true
-                    bb.MaxDistance = 500
-                    
-                    local tl = Instance.new("TextLabel")
-                    tl.Size = UDim2.new(1, 0, 1, 0)
-                    tl.BackgroundTransparency = 1
-                    tl.TextColor3 = Color3.fromRGB(255, 210, 140)
-                    tl.TextStrokeTransparency = 0
-                    tl.TextSize = 14
-                    tl.Font = Enum.Font.FredokaOne
-                    tl.Text = plr.Name
-                    tl.Parent = bb
-                    bb.Parent = head
-                    trackedPlayers[plr] = {hl = hl, bb = bb}
-                end
-            end
-            if plr.Character then onChar(plr.Character) end
-            plr.CharacterAdded:Connect(onChar)
-        end
-        for _, p in ipairs(Players:GetPlayers()) do setupPlayer(p) end
-        trackedPlayers._playerConn = Players.PlayerAdded:Connect(setupPlayer)
-    else
-        if trackedPlayers._playerConn then trackedPlayers._playerConn:Disconnect() end
-        for plr, data in pairs(trackedPlayers) do
-            if type(data) == "table" then
-                if data.hl then data.hl:Destroy() end
-                if data.bb then data.bb:Destroy() end
-            end
-        end
-        trackedPlayers = {}
+local trackedPlayers = {}
+local playerAddedConn = nil
+local playerCharConns = {}
+
+local function cleanupPlayer(plr)
+    local data = trackedPlayers[plr]
+    if not data then return end
+    if data.hl then data.hl:Destroy() end
+    if data.bb then data.bb:Destroy() end
+    trackedPlayers[plr] = nil
+    if playerCharConns[plr] then
+        playerCharConns[plr]:Disconnect()
+        playerCharConns[plr] = nil
     end
+end
+
+local function setupPlayer(plr)
+    if plr == LocalPlayer then return end
+    local function onChar(char)
+        cleanupPlayer(plr)
+        local hl = Instance.new("Highlight")
+        hl.FillColor = Color3.fromRGB(190, 130, 80)
+        hl.OutlineColor = Color3.fromRGB(240, 180, 110)
+        hl.FillTransparency = 0.4
+        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+        hl.Parent = char
+        local head = char:WaitForChild("Head", 3)
+        local bb, tl
+        if head then
+            bb = Instance.new("BillboardGui")
+            bb.Adornee = head
+            bb.Size = UDim2.new(0, 140, 0, 40)
+            bb.StudsOffsetWorldSpace = Vector3.new(0, 2.5, 0)
+            bb.AlwaysOnTop = true
+            bb.MaxDistance = 2000
+            bb.LightInfluence = 0
+            bb.ResetOnSpawn = false
+            bb.Parent = head
+            tl = Instance.new("TextLabel")
+            tl.Size = UDim2.new(1, 0, 1, 0)
+            tl.BackgroundTransparency = 1
+            tl.TextColor3 = Color3.fromRGB(255, 210, 140)
+            tl.TextStrokeTransparency = 0
+            tl.TextScaled = true
+            tl.Font = Enum.Font.FredokaOne
+            tl.Text = plr.Name
+            tl.Parent = bb
+            local sc = Instance.new("UIScale")
+            sc.Scale = 1.1
+            sc.Parent = tl
+        end
+        trackedPlayers[plr] = {hl = hl, bb = bb, tl = tl}
+    end
+    if plr.Character then onChar(plr.Character) end
+    playerCharConns[plr] = plr.CharacterAdded:Connect(onChar)
+end
+
+playerEspToggle:OnChanged(function(v)
+    if not v then
+        if playerAddedConn then playerAddedConn:Disconnect() playerAddedConn = nil end
+        for plr in pairs(trackedPlayers) do cleanupPlayer(plr) end
+        for plr, conn in pairs(playerCharConns) do
+            conn:Disconnect()
+            playerCharConns[plr] = nil
+        end
+        return
+    end
+    for _, p in ipairs(Players:GetPlayers()) do setupPlayer(p) end
+    playerAddedConn = Players.PlayerAdded:Connect(setupPlayer)
 end)
 
 -- HIDDEN SUPPORT ESP
